@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Platform } from "react-native";
 
 const api = axios.create({
     baseURL: 'http://localhost:8080', // Substitua pela URL base da sua API
@@ -10,9 +11,15 @@ const api = axios.create({
 
 // Interceptores de requisição (opcional)
 api.interceptors.request.use(
-    (config) => {
-        // Adicionar token de autenticação, se necessário
-        const token = localStorage.getItem('authToken');
+    async (config) => {
+        let token = null;
+
+        if (Platform.OS === 'web') {
+            token = localStorage.getItem('authToken');
+        } else {
+            token = await AsyncStorage.getItem('authToken');
+        }
+
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -20,6 +27,7 @@ api.interceptors.request.use(
     },
     (error) => Promise.reject(error)
 );
+
 
 // Interceptores de resposta (opcional)
 export const setupAxiosInterceptors =  ({navigate, exp}) => { 
