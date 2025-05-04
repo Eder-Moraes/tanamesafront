@@ -1,31 +1,64 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import CadastroScreen from './telas/Cadastro.js';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
-import LoginScreen from './telas/login.js';
-import { UserProvider } from './context/userContext.js';
+import React from "react";
+import { Platform } from "react-native";
+import { NativeRouter, Route, Routes } from "react-router-native"; // Para o react-router-native
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Home from "./app/index";
+import LoginScreen from "./app/login";
+import CadastroScreen from "./app/cadastro";
+import { UserProvider } from "./context/userContext";
+import { BrowserRouter } from "react-router-dom";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator(); // Usado para o Stack Navigator no mobile
 
-export default function App() {
+// Navegação para web usando react-router-dom (não react-router-native)
+function WebNavigation() {
+  console.log(Home);
+  console.log(LoginScreen);
+  console.log(CadastroScreen);
+
   return (
-    <NavigationContainer>
+    <BrowserRouter>
+      {" "}
+      {/* Para Web */}
       <UserProvider>
-      <Stack.Navigator initialRouteName="cadastro">
-        <Stack.Screen name="cadastro" component={CadastroScreen} options={{ headerShown: false }}/>
-        <Stack.Screen name="login" component={LoginScreen} options={{ headerShown: false }}/>
-      </Stack.Navigator>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/cadastro" element={<CadastroScreen />} />
+          <Route path="/login" element={<LoginScreen />} />
+        </Routes>
       </UserProvider>
-    </NavigationContainer>
+    </BrowserRouter>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+// Navegação para mobile (iOS/Android) usando react-navigation
+function MobileNavigation() {
+  return (
+    <UserProvider>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Cadastro"
+            component={CadastroScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+      </Stack.Navigator>
+    </NavigationContainer>
+    </UserProvider>
+  );
+}
+
+export default function App() {
+  return Platform.OS === "web" ? <WebNavigation /> : <MobileNavigation />;
+}

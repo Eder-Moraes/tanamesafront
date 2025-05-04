@@ -1,8 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Platform } from "react-native";
 
+const baseURL = 'http://192.168.1.7:8080';
+
 const api = axios.create({
-    baseURL: 'http://localhost:8080', // Substitua pela URL base da sua API
+    baseURL: baseURL, // Substitua pela URL base da sua API
     timeout: 30000, // Tempo limite da requisição em ms
     headers: {
         'Content-Type': 'application/json',
@@ -44,6 +47,8 @@ export const setupAxiosInterceptors =  ({navigate, exp}) => {
             exp();
             navigate('/login');
         }
+        console.log(error);
+        
         return Promise.reject(error);
     }
 );

@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   TextInput,
   View,
   Text,
   Button,
-  ScrollView,
-  Dimensions,
+  TouchableOpacity,
+  Platform,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { register } from "../api/services/authService";
+import { Link } from "react-router-native";
 
-const CadastroScreen = () => {
+const CadastroScreen = ({ navigation }) => {
   const [nome, setNome] = useState("");
   const [gmail, setGmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -21,8 +22,7 @@ const CadastroScreen = () => {
   const [genero, setGenero] = useState("");
   const [pais, setPais] = useState("");
   const [cep, setCep] = useState("");
-  const [formError, setFormError] = useState('');
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const limparCampos = () => {
     setNome("");
@@ -35,20 +35,8 @@ const CadastroScreen = () => {
     setPais("");
     setCep("");
   };
-  
 
-  useEffect(() => {
-    const updateLayout = () => {
-      setIsLargeScreen(Dimensions.get("window").width > 768);
-    };
-
-    Dimensions.addEventListener("change", updateLayout);
-    updateLayout(); // Initial check
-
-    return () => Dimensions.removeEventListener("change", updateLayout);
-  }, []);
-
-  const  handleSubmit = async () => {
+  const handleSubmit = async () => {
     let erros = [];
 
     if (!nome.trim()) erros.push("Nome completo é obrigatório.");
@@ -75,7 +63,7 @@ const CadastroScreen = () => {
         cidade,
         genero,
         pais,
-        cep
+        cep,
       };
       const data = await register(JSON.stringify(credentials));
       console.log(data);
@@ -83,67 +71,46 @@ const CadastroScreen = () => {
       limparCampos();
       alert("Cadastro realizado com sucesso!");
       setFormError("");
-  } catch (error) {
-  
-      // Verifica se o erro é um objeto de resposta (response) com método text()
-     setFormError(error?.response?.data?.error  || "Erro ao registrar!");
-  
-      console.error(error); // Loga o erro para depuração
-  }
-
+    } catch (error) {
+      setFormError(error?.response?.data?.error || "Erro ao registrar!");
+      console.error(error);
+    }
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        isLargeScreen && styles.containerLarge,
-      ]}
-    >
-      <Text style={[styles.title, isLargeScreen && styles.titleLarge]}>
-        Criar sua Conta
-      </Text>
-      <Text style={[styles.subtitle, isLargeScreen && styles.subtitleLarge]}>
+    <View style={styles.container}>
+      <Text style={styles.title}>Criar sua Conta</Text>
+      <Text style={styles.subtitle}>
         Preencha os campos abaixo para se cadastrar
       </Text>
 
-      <View
-        style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
-      >
-        <TextInput
-          style={[styles.input, isLargeScreen && styles.inputLarge]}
-          placeholder="Nome Completo"
-          value={nome}
-          onChangeText={setNome}
-        />
-        <TextInput
-          style={[styles.input, isLargeScreen && styles.inputLarge]}
-          placeholder="Seu Melhor Gmail"
-          value={gmail}
-          onChangeText={setGmail}
-          keyboardType="email-address"
-        />
-      </View>
-
-      <View
-        style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
-      >
-        <TextInput
-          style={[styles.input, isLargeScreen && styles.inputLarge]}
-          placeholder="Senha Segura"
-          secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
-        />
-        <TextInput
-          style={[styles.input, isLargeScreen && styles.inputLarge]}
-          placeholder="Confirmar Senha"
-          secureTextEntry
-          value={confirmarSenha}
-          onChangeText={setConfirmarSenha}
-        />
-      </View>
-
+      <TextInput
+        style={styles.input}
+        placeholder="Nome Completo"
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Seu Melhor Gmail"
+        value={gmail}
+        onChangeText={setGmail}
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Senha Segura"
+        secureTextEntry
+        value={senha}
+        onChangeText={setSenha}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirmar Senha"
+        secureTextEntry
+        value={confirmarSenha}
+        onChangeText={setConfirmarSenha}
+      />
       <TextInput
         style={styles.input}
         placeholder="Número de Telefone (Opcional)"
@@ -183,34 +150,33 @@ const CadastroScreen = () => {
         onChangeText={setCep}
         keyboardType="numeric"
       />
+
+      {Platform.OS === "web" ? (
+        <Link to="/login" style={{ marginTop: 15 }}>
+          <Text style={styles.link}>Já tenho uma conta</Text>
+        </Link>
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      )}
+
       {formError !== "" && <Text style={styles.errorText}>{formError}</Text>}
 
-      <Button
-        title="Criar Conta"
-        onPress={handleSubmit}
-        color="#b30000"
-        style={isLargeScreen && styles.buttonLarge}
-      />
-      <Text style={[styles.terms, isLargeScreen && styles.termsLarge]}>
+      <Button title="Criar Conta" onPress={handleSubmit} color="#b30000" />
+      <Text style={styles.terms}>
         Ao criar uma conta, você concorda com nossos Termos e Condições.
       </Text>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    backgroundColor: "#fdd835", // Amarelo mais claro para celular
+    flex: 1,
     padding: 20,
+    backgroundColor: "#fdd835",
     justifyContent: "center",
-  },
-  containerLarge: {
-    padding: 60,
-    alignItems: "center",
-    maxWidth: 800,
-    marginHorizontal: "auto",
-    backgroundColor: "#ffeb3b", // Amarelo um pouco mais forte para PC
   },
   title: {
     fontSize: 24,
@@ -219,35 +185,10 @@ const styles = StyleSheet.create({
     color: "#b30000",
     marginBottom: 15,
   },
-  titleLarge: {
-    fontSize: 36,
-    marginBottom: 30,
-  },
   subtitle: {
     fontSize: 16,
     textAlign: "center",
     color: "#555",
-    marginBottom: 30,
-  },
-  subtitleLarge: {
-    fontSize: 18,
-    marginBottom: 40,
-  },
-  column: {
-    flexDirection: "column",
-    width: "100%",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  inputGroup: {
-    marginBottom: 15,
-  },
-  inputGroupLarge: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     marginBottom: 20,
   },
   input: {
@@ -258,43 +199,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 8,
     backgroundColor: "#fff",
-    color: "#333",
     fontSize: 16,
-    width: "100%",
-  },
-  inputLarge: {
-    width: "48%",
   },
   picker: {
     height: 50,
     marginBottom: 15,
-    borderColor: "#b30000",
-    borderWidth: 1,
-    borderRadius: 8,
     backgroundColor: "#fff",
-    color: "#333",
-    fontSize: 16,
-    width: "100%",
+    borderRadius: 8,
+  },
+  link: {
+    color: "#007BFF",
+    textAlign: "center",
+    textDecorationLine: "underline",
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: "#b30000",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
   errorText: {
     color: "red",
     marginBottom: 10,
     textAlign: "center",
   },
-  buttonLarge: {
-    paddingVertical: 15,
-    fontSize: 18,
-    borderRadius: 10,
-  },
   terms: {
     fontSize: 12,
     color: "#777",
     textAlign: "center",
-    marginTop: 30,
-  },
-  termsLarge: {
-    fontSize: 14,
-    marginTop: 40,
+    marginTop: 20,
   },
 });
 
