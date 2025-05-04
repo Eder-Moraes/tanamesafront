@@ -85,132 +85,144 @@ const CadastroScreen = ({ navigation }) => {
     }
   };
 
-  return (
+  const render = () => {
+    return (
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          isLargeScreen && styles.containerLarge,
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={[styles.title, isLargeScreen && styles.titleLarge]}>
+          Criar sua Conta
+        </Text>
+        <Text style={[styles.subtitle, isLargeScreen && styles.subtitleLarge]}>
+          Preencha os campos abaixo para se cadastrar
+        </Text>
+
+        <View
+          style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
+        >
+          <TextInput
+            style={[styles.input, isLargeScreen && styles.inputLarge]}
+            placeholder="Nome Completo"
+            value={nome}
+            onChangeText={setNome}
+          />
+          <TextInput
+            style={[styles.input, isLargeScreen && styles.inputLarge]}
+            placeholder="Seu Melhor Gmail"
+            value={gmail}
+            onChangeText={setGmail}
+            keyboardType="email-address"
+          />
+        </View>
+
+        <View
+          style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
+        >
+          <TextInput
+            style={[styles.input, isLargeScreen && styles.inputLarge]}
+            placeholder="Senha Segura"
+            secureTextEntry
+            value={senha}
+            onChangeText={setSenha}
+          />
+          <TextInput
+            style={[styles.input, isLargeScreen && styles.inputLarge]}
+            placeholder="Confirmar Senha"
+            secureTextEntry
+            value={confirmarSenha}
+            onChangeText={setConfirmarSenha}
+          />
+        </View>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Número de Telefone (Opcional)"
+          value={telefone}
+          onChangeText={setTelefone}
+          keyboardType="phone-pad"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Sua Cidade"
+          value={cidade}
+          onChangeText={setCidade}
+        />
+        <Picker
+          selectedValue={genero}
+          style={styles.picker}
+          onValueChange={(itemValue) => setGenero(itemValue)}
+        >
+          <Picker.Item label="Selecione seu Gênero (Opcional)" value="" />
+          <Picker.Item label="Masculino" value="masculino" />
+          <Picker.Item label="Feminino" value="feminino" />
+          <Picker.Item label="Outro" value="outro" />
+        </Picker>
+        <Picker
+          selectedValue={pais}
+          style={styles.picker}
+          onValueChange={(itemValue) => setPais(itemValue)}
+        >
+          <Picker.Item label="Selecione seu País (Opcional)" value="" />
+          <Picker.Item label="Brasil" value="brasil" />
+          <Picker.Item label="Outro" value="outro" />
+        </Picker>
+        <TextInput
+          style={styles.input}
+          placeholder="Seu CEP (Opcional)"
+          value={cep}
+          onChangeText={setCep}
+          keyboardType="numeric"
+        />
+
+
+        {formError !== "" && <Text style={styles.errorText}>{formError}</Text>}
+
+        <Button
+          title="Criar Conta"
+          onPress={handleSubmit}
+          color="#b30000"
+          style={isLargeScreen && styles.buttonLarge}
+        />
+        {Platform.OS === "web" ? (
+          <Link to="/login" style={{ marginTop: 15 }}>
+            <Text
+              style={{
+                color: "#007BFF",
+                textAlign: "center",
+                textDecorationLine: "underline",
+              }}
+            >
+              Já tenho uma conta
+            </Text>
+          </Link>
+        ) : (
+          <TouchableOpacity
+            style={{ color: "#007BFF", fontSize: 14, alignItems: 'center', marginTop: 5 }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            <Text style={{ color: "#007BFF", fontSize: 14 }}>Já tenho uma conta</Text>
+          </TouchableOpacity>
+        )}
+        <Text style={[styles.terms, isLargeScreen && styles.termsLarge]}>
+          Ao criar uma conta, você concorda com nossos Termos e Condições.
+        </Text>
+      </ScrollView>
+    );
+  };
+
+  return Platform.OS === "web" ? (
+    render()
+  ) : (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          contentContainerStyle={[
-            styles.container,
-            isLargeScreen && styles.containerLarge,
-          ]}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text style={[styles.title, isLargeScreen && styles.titleLarge]}>
-            Criar sua Conta
-          </Text>
-          <Text style={[styles.subtitle, isLargeScreen && styles.subtitleLarge]}>
-            Preencha os campos abaixo para se cadastrar
-          </Text>
-
-          <View style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}>
-            <TextInput
-              style={[styles.input, isLargeScreen && styles.inputLarge]}
-              placeholder="Nome Completo"
-              value={nome}
-              onChangeText={setNome}
-            />
-            <TextInput
-              style={[styles.input, isLargeScreen && styles.inputLarge]}
-              placeholder="Seu Melhor Gmail"
-              value={gmail}
-              onChangeText={setGmail}
-              keyboardType="email-address"
-            />
-          </View>
-
-          <View style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}>
-            <TextInput
-              style={[styles.input, isLargeScreen && styles.inputLarge]}
-              placeholder="Senha Segura"
-              secureTextEntry
-              value={senha}
-              onChangeText={setSenha}
-            />
-            <TextInput
-              style={[styles.input, isLargeScreen && styles.inputLarge]}
-              placeholder="Confirmar Senha"
-              secureTextEntry
-              value={confirmarSenha}
-              onChangeText={setConfirmarSenha}
-            />
-          </View>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Número de Telefone (Opcional)"
-            value={telefone}
-            onChangeText={setTelefone}
-            keyboardType="phone-pad"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Sua Cidade"
-            value={cidade}
-            onChangeText={setCidade}
-          />
-          <Picker
-            selectedValue={genero}
-            style={styles.picker}
-            onValueChange={(itemValue) => setGenero(itemValue)}
-          >
-            <Picker.Item label="Selecione seu Gênero (Opcional)" value="" />
-            <Picker.Item label="Masculino" value="masculino" />
-            <Picker.Item label="Feminino" value="feminino" />
-            <Picker.Item label="Outro" value="outro" />
-          </Picker>
-          <Picker
-            selectedValue={pais}
-            style={styles.picker}
-            onValueChange={(itemValue) => setPais(itemValue)}
-          >
-            <Picker.Item label="Selecione seu País (Opcional)" value="" />
-            <Picker.Item label="Brasil" value="brasil" />
-            <Picker.Item label="Outro" value="outro" />
-          </Picker>
-          <TextInput
-            style={styles.input}
-            placeholder="Seu CEP (Opcional)"
-            value={cep}
-            onChangeText={setCep}
-            keyboardType="numeric"
-          />
-
-          {Platform.OS === "web" ? (
-            <Link to="/login" style={{ marginTop: 15 }}>
-              <Text
-                style={{
-                  color: "#007BFF",
-                  textAlign: "center",
-                  textDecorationLine: "underline",
-                }}
-              >
-                Já tenho uma conta
-              </Text>
-            </Link>
-          ) : (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate("Login")}
-            >
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-          )}
-
-          {formError !== "" && <Text style={styles.errorText}>{formError}</Text>}
-
-          <Button
-            title="Criar Conta"
-            onPress={handleSubmit}
-            color="#b30000"
-            style={isLargeScreen && styles.buttonLarge}
-          />
-          <Text style={[styles.terms, isLargeScreen && styles.termsLarge]}>
-            Ao criar uma conta, você concorda com nossos Termos e Condições.
-          </Text>
-        </ScrollView>
+        {render()}
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );

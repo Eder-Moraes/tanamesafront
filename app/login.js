@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { login } from "../api/services/authService";
-import { Link } from "expo-router"; // expo-router Link
+import { Link } from "react-router-native";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -29,8 +29,6 @@ const LoginScreen = ({ navigation }) => {
     try {
       const data = await login(JSON.stringify({ email, password }));
 
-      console.log(data);
-
       if (Platform.OS === "web") {
         localStorage.setItem("authToken", data.token);
       } else {
@@ -38,7 +36,6 @@ const LoginScreen = ({ navigation }) => {
       }
 
       limparCampos();
-      alert("Login realizado com sucesso!");
     } catch (error) {
       setErrorMessage(error?.response?.data?.error || "Erro ao logar!");
       console.log(error);
@@ -57,7 +54,6 @@ const LoginScreen = ({ navigation }) => {
         "Por favor, insira seu e-mail para receber um link de redefinição."
       );
     } else {
-      console.log(`Recuperação de senha solicitada para: ${email}`);
       Alert.alert(
         "Recuperação de Senha",
         `Um link de redefinição foi enviado para ${email} (exemplo).`
@@ -65,69 +61,67 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  return (
+  const renderContent = () => (
+    <View style={styles.container}>
+      <Image source={require("../assets/logo.png")} style={styles.logo} />
+      <Text style={styles.title}>Login</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        autoCapitalize="none"
+      />
+
+      {Platform.OS === "web" ? (
+        <Link to="/cadastro" style={{ color: "#007BFF",fontSize: 14, marginTop: 15, marginBottom: 5 }}>
+          <Text style={styles.link}>Criar conta</Text>
+        </Link>
+      ) : 
+        (<TouchableOpacity
+        style={{color: "#007BFF",fontSize: 14, marginBottom: 5}}
+        onPress={() => navigation.navigate("Cadastro")}
+      >
+        <Text style={{color: "#007BFF",fontSize: 14}}>Criar Conta</Text>
+      </TouchableOpacity>
+      )}
+
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Entrar</Text>
+      </TouchableOpacity>
+
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
+
+      <TouchableOpacity
+        style={{color: "#007BFF",fontSize: 14}}
+        onPress={handleForgotPassword}
+      >
+        <Text style={{color: "#007BFF",fontSize: 14}}>Esqueci minha senha</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return Platform.OS === "web" ? (
+    renderContent()
+  ) : (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Image source={require("../assets/logo.png")} style={styles.logo} />
-          <Text style={styles.title}>Login</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            autoCapitalize="none"
-          />
-
-          {Platform.OS === "web" ? (
-            <Link href="/cadastro" style={{ marginTop: 15 }}>
-              <Text
-                style={{
-                  color: "#007BFF",
-                  textAlign: "center",
-                  textDecorationLine: "underline",
-                }}
-              >
-                Criar conta
-              </Text>
-            </Link>
-          ) : (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate("Cadastro")}
-            >
-              <Text style={styles.buttonText}>Criar Conta</Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Entrar</Text>
-          </TouchableOpacity>
-
-          {errorMessage ? (
-            <Text style={styles.errorText}>{errorMessage}</Text>
-          ) : null}
-
-          <TouchableOpacity
-            style={styles.forgotPassword}
-            onPress={handleForgotPassword}
-          >
-            <Text style={styles.forgotPasswordText}>Esqueci minha senha</Text>
-          </TouchableOpacity>
-        </View>
+        {renderContent()}
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -156,7 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    width: "50%",
+    width: "70%",
     height: 40,
     borderWidth: 2,
     borderColor: "black",
@@ -180,9 +174,10 @@ const styles = StyleSheet.create({
   forgotPassword: {
     marginTop: 10,
   },
-  forgotPasswordText: {
+  link: {
     color: "#007BFF",
-    fontSize: 14,
+    textAlign: "center",
+    textDecorationLine: "underline",
   },
 });
 

@@ -13,9 +13,6 @@ const Stack = createNativeStackNavigator(); // Usado para o Stack Navigator no m
 
 // Navegação para web usando react-router-dom (não react-router-native)
 function WebNavigation() {
-  console.log(Home);
-  console.log(LoginScreen);
-  console.log(CadastroScreen);
 
   return (
     <BrowserRouter>
