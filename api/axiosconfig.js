@@ -1,8 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Platform } from "react-native";
+import checkUserAccess from "../utils/checkUserAccess";
 
-const baseURL = 'http://192.168.1.7:8080';
+const baseURL = 'http://10.50.63.60:8080';
 
 const api = axios.create({
     baseURL: baseURL, // Substitua pela URL base da sua API
@@ -22,6 +23,11 @@ api.interceptors.request.use(
         } else {
             token = await AsyncStorage.getItem('authToken');
         }
+
+        checkUserAccess();
+
+        console.log(token);
+        
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

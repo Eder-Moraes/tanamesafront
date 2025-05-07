@@ -10,3 +10,8 @@ export const register = async (user) => {
     const response = await api.post(endpoints.register, user);
     return response.data;
 }
+
+export const requestRecuperacao = async (email) => {
+    const response = await api.post(endpoints.requestRecuperacao, JSON.stringify({email: email}));
+    return response.data;
+}

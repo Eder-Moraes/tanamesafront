@@ -8,6 +8,7 @@ import LoginScreen from "./app/login";
 import CadastroScreen from "./app/cadastro";
 import { UserProvider } from "./context/userContext";
 import { BrowserRouter } from "react-router-dom";
+import EmailRecuperar from "./app/emailRecuperar";
 
 const Stack = createNativeStackNavigator(); // Usado para o Stack Navigator no mobile
 
@@ -23,6 +24,7 @@ function WebNavigation() {
           <Route path="/" element={<Home />} />
           <Route path="/cadastro" element={<CadastroScreen />} />
           <Route path="/login" element={<LoginScreen />} />
+          <Route path="/emailRecuperar" element={<EmailRecuperar />}></Route>
         </Routes>
       </UserProvider>
     </BrowserRouter>
@@ -48,6 +50,11 @@ function MobileNavigation() {
           <Stack.Screen
             name="Login"
             component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="EmailRecuperar"
+            component={EmailRecuperar}
             options={{ headerShown: false }}
           />
       </Stack.Navigator>

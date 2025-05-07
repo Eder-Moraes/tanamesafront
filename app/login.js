@@ -84,16 +84,24 @@ const LoginScreen = ({ navigation }) => {
       />
 
       {Platform.OS === "web" ? (
-        <Link to="/cadastro" style={{ color: "#007BFF",fontSize: 14, marginTop: 15, marginBottom: 5 }}>
+        <Link
+          to="/cadastro"
+          style={{
+            color: "#007BFF",
+            fontSize: 14,
+            marginTop: 15,
+            marginBottom: 5,
+          }}
+        >
           <Text style={styles.link}>Criar conta</Text>
         </Link>
-      ) : 
-        (<TouchableOpacity
-        style={{color: "#007BFF",fontSize: 14, marginBottom: 5}}
-        onPress={() => navigation.navigate("Cadastro")}
-      >
-        <Text style={{color: "#007BFF",fontSize: 14}}>Criar Conta</Text>
-      </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={{ color: "#007BFF", fontSize: 14, marginBottom: 5 }}
+          onPress={() => navigation.navigate("Cadastro")}
+        >
+          <Text style={{ color: "#007BFF", fontSize: 14 }}>Criar Conta</Text>
+        </TouchableOpacity>
       )}
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -104,12 +112,29 @@ const LoginScreen = ({ navigation }) => {
         <Text style={styles.errorText}>{errorMessage}</Text>
       ) : null}
 
-      <TouchableOpacity
-        style={{color: "#007BFF",fontSize: 14}}
-        onPress={handleForgotPassword}
+      {Platform.OS === "web" ? (
+        <Link
+          to="/emailRecuperar"
+          style={{
+            color: "#007BFF",
+            fontSize: 14,
+            marginTop: 15,
+            marginBottom: 5,
+          }}
+        >
+          <Text style={styles.link}>Esqueceu a senha?</Text>
+        </Link>
+      ) : (
+        <TouchableOpacity
+        style={{ color: "#007BFF", fontSize: 14 }}
+        onPress={(navigation) => navigation.navigate("EmailRecuperar")}
       >
-        <Text style={{color: "#007BFF",fontSize: 14}}>Esqueci minha senha</Text>
+        <Text style={{ color: "#007BFF", fontSize: 14 }}>
+          Esqueci minha senha
+        </Text>
       </TouchableOpacity>
+      )}
+
     </View>
   );
 
