@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Linking,
+  ScrollView,
+} from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 
 const ProfileScreen = () => {
@@ -10,21 +19,42 @@ const ProfileScreen = () => {
   const handleChoosePhoto = () => {
     launchImageLibrary(
       { mediaType: 'photo', quality: 1 },
-      function (response) {
+      (response) => {
         if (response.assets && response.assets.length > 0) {
-          setProfileImage(response.assets[0].uri); // JavaScript normal aqui
+          setProfileImage(response.assets[0].uri);
         }
       }
     );
   };
 
+  const receitas = [
+    {
+      id: 1,
+      nome: 'Bolo de Cenoura',
+      tempo: '45 min',
+      dificuldade: 'Fácil',
+      link: 'https://www.tudogostoso.com.br/receita/62544-bolo-de-cenoura.html',
+    },
+    {
+      id: 2,
+      nome: 'Feijoada',
+      tempo: '2h',
+      dificuldade: 'Difícil',
+      link: 'https://www.tudogostoso.com.br/receita/8761-feijoada.html',
+    },
+    {
+      id: 3,
+      nome: 'Panqueca Fit',
+      tempo: '20 min',
+      dificuldade: 'Normal',
+      link: 'https://www.tudogostoso.com.br/receita/179648-panqueca-fit.html',
+    },
+  ];
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={handleChoosePhoto}>
-        <Image
-          source={{ uri: profileImage }}
-          style={styles.profileImage}
-        />
+        <Image source={{ uri: profileImage }} style={styles.profileImage} />
       </TouchableOpacity>
 
       <Text style={styles.label}>Nome:</Text>
@@ -44,10 +74,37 @@ const ProfileScreen = () => {
         multiline
       />
 
-      <TouchableOpacity style={styles.editButton} onPress={handleChoosePhoto}>
-        <Text style={styles.editButtonText}>Trocar Foto</Text>
+      <TouchableOpacity style={styles.editButton} onaPress={() => alert('Perfil atualizado!')}>
+        <Text style={styles.editButtonText}>salvar perfil</Text>
       </TouchableOpacity>
-    </View>
+
+      {/* TABELA DE RECEITAS */}
+      <Text style={[styles.label, { marginTop: 30, textAlign: 'center' }]}>
+        Minhas Receitas:
+      </Text>
+      <View style={styles.table}>
+        <View style={[styles.tableRow, styles.tableHeader]}>
+          <Text style={styles.tableCellHeader}>Nome</Text>
+          <Text style={styles.tableCellHeader}>Tempo</Text>
+          <Text style={styles.tableCellHeader}>Dificuldade</Text>
+          <Text style={styles.tableCellHeader}>Ação</Text>
+        </View>
+
+        {receitas.map((item) => (
+          <View key={item.id} style={styles.tableRow}>
+            <Text style={styles.tableCell}>{item.nome}</Text>
+            <Text style={styles.tableCell}>{item.tempo}</Text>
+            <Text style={styles.tableCell}>{item.dificuldade}</Text>
+            <Text
+              style={[styles.tableCell, styles.link]}
+              onPress={() => Linking.openURL(item.link)}
+            >
+              Ver
+            </Text>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 
@@ -55,11 +112,9 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    padding: 20,
     backgroundColor: '#f2f2f2',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
   },
   profileImage: {
     width: 140,
@@ -102,5 +157,40 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  table: {
+    width: '90%',
+    alignSelf: 'center',
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
+  },
+  tableHeader: {
+    backgroundColor: '#e0e0e0',
+  },
+  tableCell: {
+    flex: 1,
+    padding: 10,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  tableCellHeader: {
+    flex: 1,
+    padding: 10,
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  link: {
+    color: '#4CAF50',
+    textDecorationLine: 'underline',
   },
 });
