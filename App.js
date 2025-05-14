@@ -9,6 +9,9 @@ import CadastroScreen from "./app/cadastro";
 import { UserProvider } from "./context/userContext";
 import { BrowserRouter } from "react-router-dom";
 import EmailRecuperar from "./app/emailRecuperar";
+import RedefinirSenha from "./app/atualizarSenha";
+import CriarReceita from "./app/criarReceita";
+import ProfileScreen from "./app/perfil";
 
 const Stack = createNativeStackNavigator(); // Usado para o Stack Navigator no mobile
 
@@ -24,7 +27,10 @@ function WebNavigation() {
           <Route path="/" element={<Home />} />
           <Route path="/cadastro" element={<CadastroScreen />} />
           <Route path="/login" element={<LoginScreen />} />
-          <Route path="/emailRecuperar" element={<EmailRecuperar />}></Route>
+          <Route path="/email-recuperar" element={<EmailRecuperar />}></Route>
+          <Route path="/redefinir-senha" element={<RedefinirSenha />}></Route>
+          <Route path="/criar-receita" element={<CriarReceita />}></Route>
+          <Route path="/perfil" element={<ProfileScreen />}></Route>
         </Routes>
       </UserProvider>
     </BrowserRouter>
@@ -55,6 +61,11 @@ function MobileNavigation() {
           <Stack.Screen
             name="EmailRecuperar"
             component={EmailRecuperar}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="RedefinirSenha"
+            component={RedefinirSenha}
             options={{ headerShown: false }}
           />
       </Stack.Navigator>

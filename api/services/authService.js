@@ -15,3 +15,8 @@ export const requestRecuperacao = async (email) => {
     const response = await api.post(endpoints.requestRecuperacao, JSON.stringify({email: email}));
     return response.data;
 }
+
+export const redefinirSenha = async (token, newPassword) => {
+    const response = await api.post(endpoints.redefinirSenha, JSON.stringify({token: token, newPassword: newPassword}));
+    return response.data;
+}

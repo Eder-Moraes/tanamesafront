@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Platform } from "react-native";
 import checkUserAccess from "../utils/checkUserAccess";
+import { Navigate } from "react-router-native";
 
 const baseURL = 'http://10.50.63.60:8080';
 
@@ -39,19 +40,18 @@ api.interceptors.request.use(
 
 
 // Interceptores de resposta (opcional)
-export const setupAxiosInterceptors =  ({navigate, exp}) => { 
+export const setupAxiosInterceptors =  () => { 
     api.interceptors.response.use(
     (response) =>  response,
     (error) => {
         // Tratamento de erros globais
         if (error.response?.status === 401) {
             console.error('Não autorizado. Redirecionando...');
-            navigate('/login');
+            Navigate('/login');
         }
         if (error.response?.status === 403) {
             console.error('Não autorizado. Redirecionando...');
-            exp();
-            navigate('/login');
+            Navigate('/login');
         }
         console.log(error);
         

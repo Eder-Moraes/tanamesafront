@@ -114,7 +114,7 @@ const LoginScreen = ({ navigation }) => {
 
       {Platform.OS === "web" ? (
         <Link
-          to="/emailRecuperar"
+          to="/email-recuperar"
           style={{
             color: "#007BFF",
             fontSize: 14,

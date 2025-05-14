@@ -5,11 +5,12 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { Image } from "react-native-web";
 import { validateEmail } from "../utils/diversos";
 import { requestRecuperacao } from "../api/services/authService";
-
+import { Link } from "react-router-native";
 
 export default function EmailRecuperar() {
   const [email, setEmail] = useState("");
@@ -22,15 +23,15 @@ export default function EmailRecuperar() {
     }
 
     try {
-          const data = await requestRecuperacao(email);
-          console.log(data);
+      const data = await requestRecuperacao(email);
+      console.log(data);
 
-          alert("Email enviado com sucesso ao email: "+email);
-          setMensagem("");
-        } catch (error) {
-          setMensagem(error?.response?.data?.error || "Erro ao enviar!");
-          console.error(error);
-        }
+      alert("Email enviado com sucesso ao email: " + email);
+      setMensagem("");
+    } catch (error) {
+      setMensagem(error?.response?.data?.error || "Erro ao enviar!");
+      console.error(error);
+    }
   };
 
   return (
@@ -52,11 +53,41 @@ export default function EmailRecuperar() {
         <Text style={styles.textoBotao}>Enviar</Text>
       </TouchableOpacity>
       <Text style={styles.mensagem}>{mensagem}</Text>
+      <div style={styles.links}>
+        {Platform.OS === "web" ? (
+          // Para Web: Usando Link para navegação
+          <>
+            <Link to="/login">
+              <Text style={{ color: "blue" }}>Ir para Login</Text>
+            </Link>
+            <Link to="/cadastro">
+              <Text style={{ color: "blue" }}>Criar Conta</Text>
+            </Link>
+          </>
+        ) : (
+          // Para iOS/Android: Usando Button do React Navigation
+          <>
+            <Button
+              title="Ir para Login"
+              onPress={() => navigation.navigate("Login")}
+            />
+            <Button
+              title="Criar Conta"
+              onPress={() => navigation.navigate("Cadastro")}
+            />
+          </>
+        )}
+      </div>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  links: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   logo: {
     width: 175,
     height: 175,
