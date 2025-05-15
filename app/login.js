@@ -14,12 +14,15 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { login } from "../api/services/authService";
-import { Link } from "react-router-native";
+import { Link, useNavigate } from "react-router-native";
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -34,6 +37,8 @@ const LoginScreen = ({ navigation }) => {
       } else {
         await AsyncStorage.setItem("authToken", data.token);
       }
+
+      navigate("/");
 
       limparCampos();
     } catch (error) {
@@ -126,15 +131,14 @@ const LoginScreen = ({ navigation }) => {
         </Link>
       ) : (
         <TouchableOpacity
-        style={{ color: "#007BFF", fontSize: 14 }}
-        onPress={(navigation) => navigation.navigate("EmailRecuperar")}
-      >
-        <Text style={{ color: "#007BFF", fontSize: 14 }}>
-          Esqueci minha senha
-        </Text>
-      </TouchableOpacity>
+          style={{ color: "#007BFF", fontSize: 14 }}
+          onPress={(navigation) => navigation.navigate("EmailRecuperar")}
+        >
+          <Text style={{ color: "#007BFF", fontSize: 14 }}>
+            Esqueci minha senha
+          </Text>
+        </TouchableOpacity>
       )}
-
     </View>
   );
 

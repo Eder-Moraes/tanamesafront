@@ -8,10 +8,11 @@ import {
   Alert,
   Button,
   Platform,
+  Image,
 } from "react-native";
-import { Image } from "react-native-web";
+import { useNavigation } from "@react-navigation/native";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-native";
 import { redefinirSenha } from "../api/services/authService";
-import { Link, Navigate, useLocation } from "react-router-native";
 
 export default function RedefinirSenha() {
   const [novaSenha, setNovaSenha] = useState("");
@@ -21,6 +22,8 @@ export default function RedefinirSenha() {
   const searchParams = new URLSearchParams(location.search);
   const token = searchParams.get("token");
 
+  const navigate = useNavigate();
+
   const handleSalvar = async () => {
     if (novaSenha.length < 6) {
       alert("Erro: A senha deve ter pelo menos 6 caracteres.");
@@ -28,12 +31,10 @@ export default function RedefinirSenha() {
       alert("Erro: As senhas não coincidem.");
     } else {
       try {
-        console.log(token);
-
         const data = await redefinirSenha(token, novaSenha);
-        console.log(data);
-        Navigate("/login");
         alert("Sucesso: Senha redefinida com sucesso!");
+
+        navigate("/login");
       } catch (error) {
         alert(error?.response?.data?.error || "Erro ao enviar!");
         console.error(error);
@@ -66,31 +67,29 @@ export default function RedefinirSenha() {
         <Text style={styles.textoBotao}>Salvar</Text>
       </TouchableOpacity>
 
-      <div style={styles.links}>
-      {Platform.OS === "web" ? (
-        // Para Web: Usando Link para navegação
-        <>
-          <Link to="/login">
-            <Text style={{ color: "blue" }}>Ir para Login</Text>
-          </Link>
-          <Link to="/cadastro">
-            <Text style={{ color: "blue" }}>Criar Conta</Text>
-          </Link>
-        </>
-      ) : (
-        // Para iOS/Android: Usando Button do React Navigation
-        <>
-          <Button
-            title="Ir para Login"
-            onPress={() => navigation.navigate("Login")}
-          />
-          <Button
-            title="Criar Conta"
-            onPress={() => navigation.navigate("Cadastro")}
-          />
-        </>
-      )}
-      </div>
+      <View style={styles.links}>
+        {Platform.OS === "web" ? (
+          <>
+            <Link to="/login">
+              <Text style={{ color: "blue" }}>Ir para Login</Text>
+            </Link>
+            <Link to="/cadastro">
+              <Text style={{ color: "blue" }}>Criar Conta</Text>
+            </Link>
+          </>
+        ) : (
+          <>
+            <Button
+              title="Ir para Login"
+              onPress={() => navigation.navigate("Login")}
+            />
+            <Button
+              title="Criar Conta"
+              onPress={() => navigation.navigate("Cadastro")}
+            />
+          </>
+        )}
+      </View>
     </View>
   );
 }
@@ -102,9 +101,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   links: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    marginTop: 20,
+    alignItems: "center",
   },
   container: {
     flex: 1,
