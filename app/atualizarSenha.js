@@ -44,83 +44,96 @@ export default function RedefinirSenha() {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/logo.png")} style={styles.logo} />
-      <Text style={styles.label}>Criar nova senha</Text>
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        value={novaSenha}
-        onChangeText={setNovaSenha}
-        placeholder="Digite a nova senha"
-      />
+      <View style={styles.Bloco}>
+        <Image source={require("../assets/logo.png")} style={styles.logo} />
+        <Text style={styles.label}>Criar nova senha</Text>
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          value={novaSenha}
+          onChangeText={setNovaSenha}
+          placeholder="Digite a nova senha"
+        />
 
-      <Text style={styles.label}>Confirmar Senha</Text>
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        value={confirmarSenha}
-        onChangeText={setConfirmarSenha}
-        placeholder="Confirme a nova senha"
-      />
+        <Text style={styles.label}>Confirmar Senha</Text>
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          value={confirmarSenha}
+          onChangeText={setConfirmarSenha}
+          placeholder="Confirme a nova senha"
+        />
 
-      <TouchableOpacity style={styles.botao} onPress={handleSalvar}>
-        <Text style={styles.textoBotao}>Salvar</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.botao} onPress={handleSalvar}>
+          <Text style={styles.textoBotao}>Salvar</Text>
+        </TouchableOpacity>
 
-      <View style={styles.links}>
-        {Platform.OS === "web" ? (
-          <>
-            <Link to="/login">
-              <Text style={{ color: "blue" }}>Ir para Login</Text>
-            </Link>
-            <Link to="/cadastro">
-              <Text style={{ color: "blue" }}>Criar Conta</Text>
-            </Link>
-          </>
-        ) : (
-          <>
-            <Button
-              title="Ir para Login"
-              onPress={() => navigation.navigate("Login")}
-            />
-            <Button
-              title="Criar Conta"
-              onPress={() => navigation.navigate("Cadastro")}
-            />
-          </>
-        )}
+        <View style={styles.links}>
+          {Platform.OS === "web" ? (
+            <>
+              <Link to="/login">
+                <Text style={{ color: "blue" }}>Ir para Login</Text>
+              </Link>
+              <Link to="/cadastro">
+                <Text style={{ color: "blue" }}>Criar Conta</Text>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Button
+                title="Ir para Login"
+                onPress={() => navigation.navigate("Login")}
+              />
+              <Button
+                title="Criar Conta"
+                onPress={() => navigation.navigate("Cadastro")}
+              />
+            </>
+          )}
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F4BD37",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  Bloco: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    width: "100%",
+    maxWidth: 400,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
   logo: {
     width: 175,
     height: 175,
     marginBottom: 20,
-  },
-  links: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-    backgroundColor: "#F4BD37",
+    alignSelf: "center",
+    marginRight: 20,
   },
   label: {
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 12,
     marginBottom: 10,
+    color: "#000",
   },
   input: {
     borderWidth: 1,
     borderColor: "#964B00",
     borderRadius: 8,
     padding: 10,
+    backgroundColor: "#fff",
   },
   botao: {
     backgroundColor: "#964B00",
@@ -133,5 +146,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  links: {
+    marginTop: 20,
+    alignItems: "center",
   },
 });

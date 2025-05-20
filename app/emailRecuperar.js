@@ -35,7 +35,8 @@ export default function EmailRecuperar() {
   };
 
   return (
-    <View style={styles.container}>
+  <View style={styles.container}>
+    <View style={styles.bloco}>
       <Image source={require("../assets/logo.png")} style={styles.logo} />
       <Text style={styles.titulo}>Esqueceu sua senha?</Text>
       <Text style={styles.subtitulo}>
@@ -53,9 +54,8 @@ export default function EmailRecuperar() {
         <Text style={styles.textoBotao}>Enviar</Text>
       </TouchableOpacity>
       <Text style={styles.mensagem}>{mensagem}</Text>
-      <div style={styles.links}>
+      <View style={styles.links}>
         {Platform.OS === "web" ? (
-          // Para Web: Usando Link para navegação
           <>
             <Link to="/login">
               <Text style={{ color: "blue" }}>Ir para Login</Text>
@@ -65,7 +65,6 @@ export default function EmailRecuperar() {
             </Link>
           </>
         ) : (
-          // Para iOS/Android: Usando Button do React Navigation
           <>
             <Button
               title="Ir para Login"
@@ -77,9 +76,11 @@ export default function EmailRecuperar() {
             />
           </>
         )}
-      </div>
+      </View>
     </View>
-  );
+  </View>
+);
+
 }
 
 const styles = StyleSheet.create({
@@ -90,12 +91,14 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 175,
+    alignSelf: "center",
     height: 175,
     marginBottom: 20,
   },
   container: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     padding: 20,
     backgroundColor: "#F4BD37",
   },
@@ -113,7 +116,22 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
+
   },
   textoBotao: { color: "white", fontSize: 16 },
   mensagem: { marginTop: 20, textAlign: "center", fontSize: 14, color: "red" },
+  
+  bloco: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 20,
+    width: "100%",
+    maxWidth: 400, // Limita a largura no Web
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5, // Para Android
+},
+
 });
