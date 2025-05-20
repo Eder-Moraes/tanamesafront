@@ -68,79 +68,69 @@ const LoginScreen = () => {
 
   const renderContent = () => (
     <View style={styles.container}>
-      <Image source={require("../assets/logo.png")} style={styles.logo} />
-      <Text style={styles.title}>Login</Text>
+      <View style={styles.Bloco}>
+        <Image source={require("../assets/logo.png")} style={styles.logo} />
+        <Text style={styles.title}>Login</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          autoCapitalize="none"
+        />
 
-      {Platform.OS === "web" ? (
-        <Link
-          to="/cadastro"
-          style={{
-            color: "#007BFF",
-            fontSize: 14,
-            marginTop: 15,
-            marginBottom: 5,
-          }}
-        >
-          <Text style={styles.link}>Criar conta</Text>
-        </Link>
-      ) : (
-        <TouchableOpacity
-          style={{ color: "#007BFF", fontSize: 14, marginBottom: 5 }}
-          onPress={() => navigation.navigate("Cadastro")}
-        >
-          <Text style={{ color: "#007BFF", fontSize: 14 }}>Criar Conta</Text>
+        {Platform.OS === "web" ? (
+          <Link
+            to="/cadastro"
+            style={{ marginTop: 15, marginBottom: 5 }}
+          >
+            <Text style={styles.link}>Criar conta</Text>
+          </Link>
+        ) : (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Cadastro")}
+            style={{ marginBottom: 5 }}
+          >
+            <Text style={styles.link}>Criar Conta</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
-      )}
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </TouchableOpacity>
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
 
-      {errorMessage ? (
-        <Text style={styles.errorText}>{errorMessage}</Text>
-      ) : null}
-
-      {Platform.OS === "web" ? (
-        <Link
-          to="/email-recuperar"
-          style={{
-            color: "#007BFF",
-            fontSize: 14,
-            marginTop: 15,
-            marginBottom: 5,
-          }}
-        >
-          <Text style={styles.link}>Esqueceu a senha?</Text>
-        </Link>
-      ) : (
-        <TouchableOpacity
-          style={{ color: "#007BFF", fontSize: 14 }}
-          onPress={(navigation) => navigation.navigate("EmailRecuperar")}
-        >
-          <Text style={{ color: "#007BFF", fontSize: 14 }}>
-            Esqueci minha senha
-          </Text>
-        </TouchableOpacity>
-      )}
+        {Platform.OS === "web" ? (
+          <Link
+            to="/email-recuperar"
+            style={{ marginTop: 15, marginBottom: 5 }}
+          >
+            <Text style={styles.link}>Esqueceu a senha?</Text>
+          </Link>
+        ) : (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("EmailRecuperar")}
+          >
+            <Text style={styles.link}>Esqueci minha senha</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
+
 
   return Platform.OS === "web" ? (
     renderContent()
@@ -168,10 +158,12 @@ const styles = StyleSheet.create({
     width: 175,
     height: 175,
     marginBottom: 20,
+    marginRight: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    marginRight: 20,
     marginBottom: 24,
   },
   errorText: {
@@ -190,7 +182,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   button: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#964B00",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -207,6 +199,14 @@ const styles = StyleSheet.create({
     color: "#007BFF",
     textAlign: "center",
     textDecorationLine: "underline",
+  },
+  Bloco: {
+    width: "100%",
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 20,
+    alignItems: "center",
+    maxWidth: 400,
   },
 });
 

@@ -35,51 +35,51 @@ export default function EmailRecuperar() {
   };
 
   return (
-  <View style={styles.container}>
-    <View style={styles.bloco}>
-      <Image source={require("../assets/logo.png")} style={styles.logo} />
-      <Text style={styles.titulo}>Esqueceu sua senha?</Text>
-      <Text style={styles.subtitulo}>
-        Enviaremos um e-mail com instruções de como redefinir sua senha.
-      </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite seu e-mail"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TouchableOpacity style={styles.botao} onPress={enviarEmail}>
-        <Text style={styles.textoBotao}>Enviar</Text>
-      </TouchableOpacity>
-      <Text style={styles.mensagem}>{mensagem}</Text>
-      <View style={styles.links}>
-        {Platform.OS === "web" ? (
-          <>
-            <Link to="/login">
-              <Text style={{ color: "blue" }}>Ir para Login</Text>
-            </Link>
-            <Link to="/cadastro">
-              <Text style={{ color: "blue" }}>Criar Conta</Text>
-            </Link>
-          </>
-        ) : (
-          <>
-            <Button
-              title="Ir para Login"
-              onPress={() => navigation.navigate("Login")}
-            />
-            <Button
-              title="Criar Conta"
-              onPress={() => navigation.navigate("Cadastro")}
-            />
-          </>
-        )}
+    <View style={styles.container}>
+      <View style={styles.bloco}>
+        <Image source={require("../assets/logo.png")} style={styles.logo} />
+        <Text style={styles.titulo}>Esqueceu sua senha?</Text>
+        <Text style={styles.subtitulo}>
+          Enviaremos um e-mail com instruções de como redefinir sua senha.
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite seu e-mail"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TouchableOpacity style={styles.botao} onPress={enviarEmail}>
+          <Text style={styles.textoBotao}>Enviar</Text>
+        </TouchableOpacity>
+        <Text style={styles.mensagem}>{mensagem}</Text>
+        <View style={styles.links}>
+          {Platform.OS === "web" ? (
+            <>
+              <Link to="/login">
+                <Text style={{ color: "blue" }}>Ir para Login</Text>
+              </Link>
+              <Link to="/cadastro">
+                <Text style={{ color: "blue" }}>Criar Conta</Text>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Button
+                title="Ir para Login"
+                onPress={() => navigation.navigate("Login")}
+              />
+              <Button
+                title="Criar Conta"
+                onPress={() => navigation.navigate("Cadastro")}
+              />
+            </>
+          )}
+        </View>
       </View>
     </View>
-  </View>
-);
+  );
 
 }
 
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     height: 175,
     marginBottom: 20,
+    marginRight: 20,
   },
   container: {
     flex: 1,
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   botao: {
-    backgroundColor: "#333",
+    backgroundColor: "#964B00",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   },
   textoBotao: { color: "white", fontSize: 16 },
   mensagem: { marginTop: 20, textAlign: "center", fontSize: 14, color: "red" },
-  
+
   bloco: {
     backgroundColor: "white",
     borderRadius: 16,
@@ -132,6 +133,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5, // Para Android
-},
+  },
 
 });
