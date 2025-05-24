@@ -4,13 +4,13 @@ import { Platform } from "react-native";
 import checkUserAccess from "../utils/checkUserAccess";
 import { Navigate } from "react-router-native";
 
-const baseURL = 'http://10.50.63.60:8080';
+const baseURL = 'http://localhost:8080';
 
 const api = axios.create({
     baseURL: baseURL, // Substitua pela URL base da sua API
     timeout: 30000, // Tempo limite da requisição em ms
     headers: {
-        'Content-Type': 'application/json',
+        "Content-Type":"application/json"
     },
 });
 
@@ -39,25 +39,24 @@ api.interceptors.request.use(
 );
 
 
-// Interceptores de resposta (opcional)
-export const setupAxiosInterceptors =  () => { 
-    api.interceptors.response.use(
-    (response) =>  response,
-    (error) => {
-        // Tratamento de erros globais
-        if (error.response?.status === 401) {
-            console.error('Não autorizado. Redirecionando...');
-            Navigate('/login');
-        }
-        if (error.response?.status === 403) {
-            console.error('Não autorizado. Redirecionando...');
-            Navigate('/login');
-        }
-        console.log(error);
-        
-        return Promise.reject(error);
+const rotasPublicas = ['/login', '/cadastro', '/recuperar-senha', '/email-recuperar'];
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+    const pathname = window.location.pathname;
+
+    if ((status === 401 || status === 403) && !rotasPublicas.includes(pathname)) {
+    //   console.warn('Token inválido. Redirecionando para login...');
+    //   localStorage.removeItem('authToken'); // ou AsyncStorage se for nativo
+    //   window.location.href = '/login';
     }
+
+    return Promise.reject(error);
+  }
 );
-}
+
+
 
 export default api;

@@ -10,7 +10,7 @@ import { UserProvider } from "./context/userContext";
 import { BrowserRouter } from "react-router-dom";
 import EmailRecuperar from "./app/emailRecuperar";
 import RedefinirSenha from "./app/atualizarSenha";
-import CriarReceita from "./app/criarReceita";
+import CriarReceita from "./app/criarReceita2";
 import ProfileScreen from "./app/perfil";
 
 const Stack = createNativeStackNavigator(); // Usado para o Stack Navigator no mobile

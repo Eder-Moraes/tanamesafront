@@ -1,41 +1,124 @@
-import React, { useState } from 'react';
-import { ScrollView, View, Text, TextInput, StyleSheet, Button, SafeAreaView, TouchableOpacity, Image } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import React, { useState } from "react";
+import {
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Button,
+  SafeAreaView,
+  TouchableOpacity,
+  Image,
+  Platform,
+} from "react-native";
+import { launchImageLibrary } from "react-native-image-picker";
+import { Picker } from "react-native-web";
+import { salvarReceita } from "../api/services/receitaService";
+import placeholder from "../assets/receita-placeholder.png";
 
 export default function CriarReceita() {
-  const [titulo, setTitulo] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [ingredientes, setIngredientes] = useState('');
-  const [preparo, setPreparo] = useState('');
-  const [rendimento, setRendimento] = useState('');
-  const [tempo, setTempo] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [imagem, setImagem] = useState('https://i.pinimg.com/474x/a8/da/22/a8da222be70a71e7858bf752065d5cc3.jpg');
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [ingredientes, setIngredientes] = useState("");
+  const [preparo, setPreparo] = useState("");
+  const [rendimento, setRendimento] = useState("");
+  const [tempo, setTempo] = useState("");
+  const [categoria, setCategoria] = useState("");
 
-  const clicado = () =>{
-    launchImageLibrary(
-      { mediaType: 'photo', quality: 1 },
-      (response) => {
-        if (response.didCancel) {
-          console.log("Usuário cancelou a seleção de imagem");
-          return;
-        }
-        if (response.assets && response.assets.length > 0) {
-          setImagem(response.assets[0].uri);
+  const [imagemPreview, setImagemPreview] = useState(placeholder);
+  const [imagemArquivo, setImagemArquivo] = useState(null);
+
+  const clicado = async () => {
+    try {
+      const response = await launchImageLibrary({
+        mediaType: "photo",
+        quality: 1,
+        includeBase64: false,
+      });
+
+      if (response.didCancel) {
+        console.log("Usuário cancelou a seleção de imagem");
+        return;
+      }
+
+      if (response.assets && response.assets.length > 0) {
+        const asset = response.assets[0];
+        setImagemPreview({ uri: asset.uri });
+
+        if (Platform.OS === "web") {
+          const blob = await fetch(asset.uri).then(res => res.blob());
+          const file = new File([blob], asset.fileName || "imagem.jpg", {
+            type: blob.type,
+          });
+          setImagemArquivo(file);
+        } else {
+          setImagemArquivo({
+            uri: asset.uri,
+            type: asset.type,
+            name: asset.fileName || "imagem.jpg",
+          });
         }
       }
-    );
+    } catch (error) {
+      console.log("Erro ao selecionar imagem:", error);
+    }
   };
 
+  const handleSalvar = async () => {
+    if (
+      !titulo ||
+      !descricao ||
+      !ingredientes ||
+      !preparo ||
+      !rendimento ||
+      !tempo ||
+      !categoria
+    ) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const receita = {
+      titulo,
+      descricao,
+      ingredientes,
+      modoPreparo: preparo,
+      rendimento,
+      tempoPreparo: tempo,
+      categoria,
+    };
+
+    const formData = new FormData();
+    formData.append("receitaCreateDTO", JSON.stringify(receita));
+
+    if (imagemArquivo) {
+      formData.append("imagem", imagemArquivo);
+    }
+
+    console.log(imagemArquivo);
+    
+
+    try {
+      const data = await salvarReceita(formData);
+      alert("Sucesso: Receita criada com sucesso!");
+      console.log(data);
+    } catch (error) {
+      alert(error?.response?.data?.error || "Erro ao enviar!");
+      console.error(error);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <Text style={styles.header}>Criar Receita</Text>
 
-        {/*imagem*/}
         <TouchableOpacity onPress={clicado}>
-        <Image source={{uri:imagem}} style={styles.imagem}/>
+          <Image
+            source={imagemPreview}
+            style={styles.imagem}
+            resizeMode="cover"
+          />
         </TouchableOpacity>
 
         <Text style={styles.label}>Título da receita</Text>
@@ -95,15 +178,17 @@ export default function CriarReceita() {
         </View>
 
         <Text style={styles.label}>Categoria</Text>
-        <TextInput
+        <Picker
+          selectedValue={categoria}
+          onValueChange={(itemValue) => setCategoria(itemValue)}
           style={styles.input}
-          value={categoria}
-          onChangeText={setCategoria}
-          placeholder="Ex: Doce, Salgado, Assado..."
-        />
+        >
+          <Picker.Item label="Selecione uma categoria..." value="" />
+          <Picker.Item label="Comida" value="COMIDA" />
+        </Picker>
 
         <View style={styles.buttonContainer}>
-          <Button title="Salvar receita" color="green" onPress={() => alert('Receita salva!')} />
+          <Button title="Salvar receita" color="green" onPress={handleSalvar} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -113,14 +198,14 @@ export default function CriarReceita() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#F4BD37',
+    backgroundColor: "#F4BD37",
     flex: 1,
   },
   header: {
     fontSize: 24,
     marginBottom: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   label: {
     fontSize: 16,
@@ -128,30 +213,30 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     height: 40,
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   inputLongo: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     height: 40,
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   textarea: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     height: 100,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: '#fff',
-    textAlignVertical: 'top',
+    backgroundColor: "#fff",
+    textAlignVertical: "top",
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 10,
   },
   col: {
@@ -160,14 +245,13 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 30,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
-  imagem:{
+  imagem: {
     width: 100,
     height: 100,
-    borderRadius: 100, // Deixa a imagem circular
-    resizeMode: 'cover',
+    borderRadius: 100,
     marginBottom: 10,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
 });
