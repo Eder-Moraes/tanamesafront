@@ -1,106 +1,172 @@
-import React, {useState} from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Linking, SafeAreaView } from 'react-native';
-import StarRating from './components/Avalia';
-import Comentarios from './components/coment';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  SafeAreaView,
+} from "react-native";
+import StarRating from "./components/Avalia";
+import Comentarios from "./components/coment";
+import { getReceitaById } from "../api/services/receitaService";
+import { getUserById } from "../api/services/userService";
 
-const receita = {
-  nome: 'Bolo de Chocolate',
-  imagem: 'https://vovopalmirinha.com.br/wp-content/uploads/2016/05/bolo-chocolate-simples-1.jpg',
-  descricao: 'Um delicioso bolo de chocolate fofinho!',
-  ingredientes: ['2 xícaras de farinha', '1 xícara de açúcar', '1/2 xícara de cacau', '3 ovos', '1/2 xícara de óleo', '1 xícara de leite', '1 colher de fermento'],
-  categoria: 'Sobremesa',
-  preparo: 'Misture os ingredientes, asse por 40 minutos a 180°C.',
-  rendimento: '10 porções',
-  tempo: '45 minutos',
+const receitaDefault = {
+  nome: "Bolo de Chocolate",
+  imagem:
+    "receita-placeholder.png",
+  descricao: "Um delicioso bolo de chocolate fofinho!",
+  ingredientes: [
+    "2 xícaras de farinha",
+    "1 xícara de açúcar",
+    "1/2 xícara de cacau",
+    "3 ovos",
+    "1/2 xícara de óleo",
+    "1 xícara de leite",
+    "1 colher de fermento",
+  ],
+  categoria: "Sobremesa",
+  preparo: "Misture os ingredientes, asse por 40 minutos a 180°C.",
+  rendimento: "10 porções",
+  tempo: "45 minutos",
 };
 
-const autor = {
-  nome: "Pessoa",
-  imagem: "https://th.bing.com/th/id/OIP.Rqw5f6J3R0bxYCe3HnMflQAAAA?cb=iwc2&rs=1&pid=ImgDetMain",
+const autorDefault = {
+  username: "Pessoa",
+  pathImage:
+    "receita-placeholder.png",
 };
 
-const abrirLink = () =>{
-  Linking.openURL('https://www.bing.com/?FORM=Z9FD1');
+const abrirLink = (categoria) => {
+  Linking.openURL("http://localhost:8080");
 };
 
 const Receita = () => {
   const [clicado, setClicado] = useState(false);
-  const [avalia, setAvalia] = useState('');
+  const [receita, setReceita] = useState(receitaDefault);
+  const [autor, setAutor] = useState(autorDefault);
 
-  const favorito = () =>{
+  const searchParams = new URLSearchParams(location.search);
+  const id_receita = searchParams.get("idReceita");
+
+  const BASE_URL = "http://localhost:8080"; // troque pelo seu IP
+
+  const favorito = () => {
     setClicado(!clicado);
   };
 
+  const fetchReceita = async (id_receita) => {
+    if (id_receita) {
+      try {
+        const data = await getReceitaById(id_receita);
+        setReceita(data);
+        console.log(data);
+        const data2 = await getUserById(data.id_autor);
+        console.log(data2);
+        setAutor(data2);
+      } catch (error) {
+        alert(error?.response?.data?.error || "Erro ao buscar receita!");
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchReceita(id_receita);
+  }, [id_receita]);
 
   return (
     <SafeAreaView style={styles.container}>
-    <ScrollView style={styles.scroll}>
+      <ScrollView style={styles.scroll}>
+        {/* Autor */}
+        <View style={styles.autor}>
+          <Image
+            source={{
+              uri: `${BASE_URL}/files/images/${
+                autor.pathImage || autorDefault.pathImage
+              }`,
+            }}
+            style={styles.imagemAutor}
+          />
 
-      {/*Autor*/}
-      <View style={styles.autor}>
-      <Image source={{uri: autor.imagem}} style={styles.imagemAutor}/>
-      <Text style={styles.boldAutor}>Autor: </Text>
-      <Text style={styles.textoAutor}> {autor.nome}</Text>
-      </View>
+          <Text style={styles.boldAutor}>
+            Autor: <Text style={styles.textoAutor}>{autor.username}</Text>
+          </Text>
+        </View>
 
-      {/* titulo*/}
-      <Text style={styles.title}>{receita.nome}</Text>
+        {/* Título */}
+        <Text style={styles.title}>{receita.nome}</Text>
 
-      {/*imagem da receita*/}
-      <Image source={{ uri: receita.imagem }} style={styles.imagemReceita} />
+        {/* Imagem da receita */}
+        <Image
+          source={{
+            uri: `${BASE_URL}/files/images/${
+              receita.imagemUrl || receitaDefault.imagem
+            }`,
+          }}
+          style={styles.imagemReceita}
+          resizeMode="cover"
+        />
 
-      {/*categoria*/}
-      <View style={styles.cat}>
-      <Text style={styles.bold}>Categoria: </Text>
-      <TouchableOpacity onPress={abrirLink}>
-        <Text style={styles.link}>
-        {receita.categoria}</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Categoria */}
+        <View style={styles.cat}>
+          <Text style={styles.bold}>Categoria: </Text>
+          <TouchableOpacity onPress={abrirLink}>
+            <Text style={styles.link}>{receita.categoria}</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.gosto}>
-      {/*Botão de avalização*/}
-      <StarRating onRatingChange ={(estrela) => setAvalia(estrela)}/>
+        <View style={styles.gosto}>
+          {/* Botão de favorito */}
+          <TouchableOpacity onPress={favorito}>
+            <Text style={clicado ? styles.selecionado : styles.nSelecionado}>
+              {"♥"}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/*Botão de favorito*/}
-      <TouchableOpacity onPress={favorito}>
-      <Text style={clicado ? styles.selecionado : styles.nselecionado}>♥</Text>
-      </TouchableOpacity>
+        {/* Descrição */}
+        <View style={styles.quadrado}>
+          <Text style={styles.descricao}>{receita.descricao}</Text>
+        </View>
 
-      </View> 
-      
-      {/*descricao*/}
-      <View style={styles.quadrado}>
-        <Text style={styles.descricao}>{receita.descricao}</Text>
-      </View>
+        {/* Tempo */}
+        <View style={styles.quadrado}>
+          <Text style={styles.info}>
+            <Text style={styles.bold}>Tempo de preparo:</Text>{" "}
+            {receita.tempoPreparo}
+          </Text>
+        </View>
 
-       {/*tempo*/}
-      <View style={styles.quadrado}>
-       <Text style={styles.info}><Text style={styles.bold}>Tempo de preparo:</Text> {receita.tempo}</Text>
-      </View>
+        {/* Ingredientes */}
+        <View style={styles.quadrado}>
+          <Text style={styles.subtitle}>Ingredientes:</Text>
+          <Text style={styles.ingrediente}>{receita.ingredientes}</Text>
+        </View>
 
-      {/*igredientes*/}
-      <View style={styles.quadrado}>
-        <Text style={styles.subtitle}>Ingredientes:</Text>
-        {receita.ingredientes.map((ingrediente, index) => (
-          <Text key={index} style={styles.ingrediente}>• {ingrediente}</Text>
-        ))}
-      </View>
+        {/* Preparo */}
+        <View style={styles.quadrado}>
+          <Text style={styles.info}>
+            <Text style={styles.bold}>Modo de preparo:</Text>{" "}
+            {receita.modoPreparo}
+          </Text>
+        </View>
 
-      {/*preparo*/}
-      <View style={styles.quadrado}>
-        <Text style={styles.info}><Text style={styles.bold}>Modo de preparo:</Text> {receita.preparo}</Text>
-      </View>
-      
-      {/*rendimento*/}
-      <View style={styles.quadrado}>
-        <Text style={styles.info}><Text style={styles.bold}>Rendimento:</Text> {receita.rendimento}</Text>
-      </View>
+        {/* Rendimento */}
+        <View style={styles.quadrado}>
+          <Text style={styles.info}>
+            <Text style={styles.bold}>Rendimento:</Text> {receita.rendimento}
+          </Text>
+        </View>
 
-      {/*Campo de comentários*/}
-      <View style={styles.coment}> <Comentarios largura={'95%'} corFundo={'#ebd1bc'}/> </View>
-
-    </ScrollView>
+        {/* Campo de comentários */}
+        <View style={styles.coment}>
+          <Comentarios largura={"95%"} corFundo={"#ebd1bc"} id_receita={id_receita}/>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -108,33 +174,35 @@ const Receita = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#FFDAB9',
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#FFDAB9",
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
+
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
     marginLeft: 5,
   },
   imagemReceita: {
-    width: 200,
-    height: 200,
-    borderRadius: 100, // Deixa a imagem circular
-    resizeMode: 'cover',
+    width: "100%",
+    maxWidth: 800,
+    height: 400,
+    borderRadius: 16,
     marginBottom: 10,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   descricao: {
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   ingrediente: {
     fontSize: 16,
@@ -144,67 +212,74 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   bold: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-  quadrado:{
+  quadrado: {
     backgroundColor: "white",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 8,
     borderRadius: 25,
     marginBottom: 10,
   },
-  cat:{
-    alignItems: 'center',
+  cat: {
+    alignItems: "center",
     marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
-  link:{
-    color: 'blue',
-    fontWeight: '16',
+  link: {
+    color: "blue",
+    fontWeight: "bold", // Corrigido: não pode ser número
   },
-  scroll:{},
-  imagemAutor:{
+  scroll: {
+    width: "100%",
+    maxWidth: 1000,
+    paddingHorizontal: 20,
+    alignSelf: "center",
+  },
+  imagemAutor: {
     width: 50,
     height: 50,
     borderRadius: 100,
   },
-  autor:{
-    flexDirection: 'row',
+  autor: {
+    flexDirection: "row",
     marginBottom: 10,
     marginTop: 5,
     marginLeft: 5,
+    alignItems: "center", // Para alinhar verticalmente imagem e texto
   },
-  boldAutor:{
-    fontWeight: 'bold',
-    marginTop:15,
+  boldAutor: {
+    fontWeight: "bold",
     marginLeft: 5,
+    fontSize: 16,
   },
-  textoAutor:{
-    marginTop: 15,
+  textoAutor: {
+    fontWeight: "normal",
+    fontSize: 16,
   },
-  selecionado:{
-    color:'red',
+  selecionado: {
+    color: "red",
     fontSize: 50,
-    textShadowColor: 'black',
-    textShadowOffset: { width: 1, height: 1 }, 
-    textShadowRadius: 2, 
-  },
-  nselecionado:{
-    color: 'grey',
-    fontSize: 50,
-    textShadowColor: 'black',
+    textShadowColor: "black",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  gosto:{
-    flexDirection: 'row',
-    alignSelf: 'center',
-    alignItems: 'center',
+  nSelecionado: {
+    color: "grey",
+    fontSize: 50,
+    textShadowColor: "black",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
-  coment:{
-    alignItems: 'center',
+  gosto: {
+    flexDirection: "row",
+    alignSelf: "center",
+    alignItems: "center",
+  },
+  coment: {
+    alignItems: "center",
   },
 });
 

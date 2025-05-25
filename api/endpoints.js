@@ -3,7 +3,8 @@ const endpoints = {
     register: '/auth/register',
     requestRecuperacao: '/password-reset/request',
     redefinirSenha: '/password-reset/reset',
-    receitas: '/receitas'
+    receitas: '/receitas',
+    users: '/users'
 };
 
 export default endpoints;

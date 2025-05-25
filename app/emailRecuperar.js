@@ -127,12 +127,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     width: "100%",
-    maxWidth: 400, // Limita a largura no Web
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5, // Para Android
+    maxWidth: 400,
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)", // substitui as props de shadow
+    elevation: 5, // continua necessário no Android
   },
 
 });

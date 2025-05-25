@@ -9,3 +9,8 @@ export const salvarReceita = async (receitaFormData) => {
     });
     return response.data;
 }
+
+export const getReceitaById = async (id) => {
+    const response = await api.get(endpoints.receitas+`/receita/${id}`);
+    return response.data;
+}

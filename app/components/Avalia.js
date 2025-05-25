@@ -1,59 +1,50 @@
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-const StarRating = ({onRatingChange}) =>{
+const StarRating = ({ onRatingChange }) => {
   const [rating, setRating] = useState(0);
 
-const mandaAva = (estrelas) =>{
-  setRating(estrelas);
-  onRatingChange(estrelas);
-};
-
-  const renderStars = () =>{
-    let stars = [];
-
-    for(let i = 1; i <= 5; i++){
-      stars.push(<TouchableOpacity key={i}
-      onPress={() => mandaAva(i)}>
-      <Text style={i <= rating ? styles.starSelected: styles.starUnselected}>
-      ★
-      </Text>
-      </TouchableOpacity>
-      );
-    }
-    return stars;
+  const mandaAva = (estrelas) => {
+    setRating(estrelas);
+    onRatingChange(estrelas);
   };
 
-  return(
+  return (
     <View style={styles.container}>
-    <View style={styles.starContainer}>{renderStars()}</View>
+      <View style={styles.starContainer}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <TouchableOpacity key={i} onPress={() => mandaAva(i)}>
+            <Text
+              style={i <= rating ? styles.starSelected : styles.starUnselected}
+            >
+              {"★"}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container:{
-    alignItems: 'center',
+  container: {
+    alignItems: "center",
     padding: 20,
   },
-  starContainer:{
-    flexDirection:'row',
-    textShadowColor: 'black', // Cor do contorno
-    textShadowOffset: { width: 1, height: 1 }, // Pequena sombra
-    textShadowRadius: 2, // Suaviza o contorno
+  starContainer: {
+    flexDirection: "row",
   },
-  starSelected:{
-    fontSize:40,
-    color:'gold',
+  starSelected: {
+    fontSize: 40,
+    color: "gold",
     marginHorizontal: 5,
-    flexDirection:'row',
+    textShadow: "1px 1px 2px black",
   },
-  starUnselected:{
-    fontSize:40,
-    color:'gray',
+  starUnselected: {
+    fontSize: 40,
+    color: "gray",
     marginHorizontal: 5,
-    flexDirection:'row',
-    
+    textShadow: "1px 1px 2px black",
   },
 });
 

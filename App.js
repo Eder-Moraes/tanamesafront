@@ -12,6 +12,7 @@ import EmailRecuperar from "./app/emailRecuperar";
 import RedefinirSenha from "./app/atualizarSenha";
 import CriarReceita from "./app/criarReceita2";
 import ProfileScreen from "./app/perfil";
+import Receita from "./app/paginaReceitas";
 
 const Stack = createNativeStackNavigator(); // Usado para o Stack Navigator no mobile
 
@@ -31,6 +32,7 @@ function WebNavigation() {
           <Route path="/redefinir-senha" element={<RedefinirSenha />}></Route>
           <Route path="/criar-receita" element={<CriarReceita />}></Route>
           <Route path="/perfil" element={<ProfileScreen />}></Route>
+          <Route path="/receitas" element={<Receita />}></Route>
         </Routes>
       </UserProvider>
     </BrowserRouter>
