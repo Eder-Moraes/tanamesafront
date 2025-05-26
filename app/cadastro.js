@@ -1,17 +1,6 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  Text,
-  Button,
-  TouchableOpacity,
-  Platform,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  ScrollView,
-  Keyboard,
-  useWindowDimensions,
+import {StyleSheet,TextInput, View, Text, Button,TouchableOpacity, Platform, TouchableWithoutFeedback, KeyboardAvoidingView, 
+ScrollView, Keyboard, useWindowDimensions,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { register } from "../api/services/authService";
@@ -94,122 +83,146 @@ const CadastroScreen = ({ navigation }) => {
         ]}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={[styles.title, isLargeScreen && styles.titleLarge]}>
-          Criar sua Conta
-        </Text>
-        <Text style={[styles.subtitle, isLargeScreen && styles.subtitleLarge]}>
-          Preencha os campos abaixo para se cadastrar
-        </Text>
-
         <View
-          style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
+          style={[
+            styles.formContainer,
+            isLargeScreen && styles.formContainerLarge,
+          ]}
         >
+          <Text style={[styles.title, isLargeScreen && styles.titleLarge]}>
+            Criar sua Conta
+          </Text>
+          <Text
+            style={[styles.subtitle, isLargeScreen && styles.subtitleLarge]}
+          >
+            Preencha os campos abaixo para se cadastrar
+          </Text>
+
+          <View
+            style={[
+              styles.inputGroup,
+              isLargeScreen && styles.inputGroupLarge,
+            ]}
+          >
+            <TextInput
+              style={[styles.input, isLargeScreen && styles.inputLarge]}
+              placeholder="Nome Completo"
+              value={nome}
+              onChangeText={setNome}
+            />
+            <TextInput
+              style={[styles.input, isLargeScreen && styles.inputLarge]}
+              placeholder="Seu Melhor Gmail"
+              value={gmail}
+              onChangeText={setGmail}
+              keyboardType="email-address"
+            />
+          </View>
+
+          <View
+            style={[
+              styles.inputGroup,
+              isLargeScreen && styles.inputGroupLarge,
+            ]}
+          >
+            <TextInput
+              style={[styles.input, isLargeScreen && styles.inputLarge]}
+              placeholder="Senha Segura"
+              secureTextEntry
+              value={senha}
+              onChangeText={setSenha}
+            />
+            <TextInput
+              style={[styles.input, isLargeScreen && styles.inputLarge]}
+              placeholder="Confirmar Senha"
+              secureTextEntry
+              value={confirmarSenha}
+              onChangeText={setConfirmarSenha}
+            />
+          </View>
+
           <TextInput
-            style={[styles.input, isLargeScreen && styles.inputLarge]}
-            placeholder="Nome Completo"
-            value={nome}
-            onChangeText={setNome}
+            style={styles.input}
+            placeholder="Número de Telefone (Opcional)"
+            value={telefone}
+            onChangeText={setTelefone}
+            keyboardType="phone-pad"
           />
           <TextInput
-            style={[styles.input, isLargeScreen && styles.inputLarge]}
-            placeholder="Seu Melhor Gmail"
-            value={gmail}
-            onChangeText={setGmail}
-            keyboardType="email-address"
+            style={styles.input}
+            placeholder="Sua Cidade"
+            value={cidade}
+            onChangeText={setCidade}
           />
-        </View>
-
-        <View
-          style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
-        >
+          <Picker
+            selectedValue={genero}
+            style={styles.picker}
+            onValueChange={(itemValue) => setGenero(itemValue)}
+          >
+            <Picker.Item label="Selecione seu Gênero (Opcional)" value="" />
+            <Picker.Item label="Masculino" value="masculino" />
+            <Picker.Item label="Feminino" value="feminino" />
+            <Picker.Item label="Outro" value="outro" />
+          </Picker>
+          <Picker
+            selectedValue={pais}
+            style={styles.picker}
+            onValueChange={(itemValue) => setPais(itemValue)}
+          >
+            <Picker.Item label="Selecione seu País (Opcional)" value="" />
+            <Picker.Item label="Brasil" value="brasil" />
+            <Picker.Item label="Outro" value="outro" />
+          </Picker>
           <TextInput
-            style={[styles.input, isLargeScreen && styles.inputLarge]}
-            placeholder="Senha Segura"
-            secureTextEntry
-            value={senha}
-            onChangeText={setSenha}
+            style={styles.input}
+            placeholder="Seu CEP (Opcional)"
+            value={cep}
+            onChangeText={setCep}
+            keyboardType="numeric"
           />
-          <TextInput
-            style={[styles.input, isLargeScreen && styles.inputLarge]}
-            placeholder="Confirmar Senha"
-            secureTextEntry
-            value={confirmarSenha}
-            onChangeText={setConfirmarSenha}
+
+          {formError !== "" && (
+            <Text style={styles.errorText}>{formError}</Text>
+          )}
+
+          <Button
+            title="Criar Conta"
+            onPress={handleSubmit}
+            color="#b30000"
+            style={isLargeScreen && styles.buttonLarge}
           />
-        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Número de Telefone (Opcional)"
-          value={telefone}
-          onChangeText={setTelefone}
-          keyboardType="phone-pad"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Sua Cidade"
-          value={cidade}
-          onChangeText={setCidade}
-        />
-        <Picker
-          selectedValue={genero}
-          style={styles.picker}
-          onValueChange={(itemValue) => setGenero(itemValue)}
-        >
-          <Picker.Item label="Selecione seu Gênero (Opcional)" value="" />
-          <Picker.Item label="Masculino" value="masculino" />
-          <Picker.Item label="Feminino" value="feminino" />
-          <Picker.Item label="Outro" value="outro" />
-        </Picker>
-        <Picker
-          selectedValue={pais}
-          style={styles.picker}
-          onValueChange={(itemValue) => setPais(itemValue)}
-        >
-          <Picker.Item label="Selecione seu País (Opcional)" value="" />
-          <Picker.Item label="Brasil" value="brasil" />
-          <Picker.Item label="Outro" value="outro" />
-        </Picker>
-        <TextInput
-          style={styles.input}
-          placeholder="Seu CEP (Opcional)"
-          value={cep}
-          onChangeText={setCep}
-          keyboardType="numeric"
-        />
-
-
-        {formError !== "" && <Text style={styles.errorText}>{formError}</Text>}
-
-        <Button
-          title="Criar Conta"
-          onPress={handleSubmit}
-          color="#b30000"
-          style={isLargeScreen && styles.buttonLarge}
-        />
-        {Platform.OS === "web" ? (
-          <Link to="/login" style={{ marginTop: 15 }}>
-            <Text
+          {Platform.OS === "web" ? (
+            <Link to="/login" style={{ marginTop: 15 }}>
+              <Text
+                style={{
+                  color: "#007BFF",
+                  textAlign: "center",
+                  textDecorationLine: "underline",
+                }}
+              >
+                Já tenho uma conta
+              </Text>
+            </Link>
+          ) : (
+            <TouchableOpacity
               style={{
                 color: "#007BFF",
-                textAlign: "center",
-                textDecorationLine: "underline",
+                fontSize: 14,
+                alignItems: "center",
+                marginTop: 5,
               }}
+              onPress={() => navigation.navigate("Login")}
             >
-              Já tenho uma conta
-            </Text>
-          </Link>
-        ) : (
-          <TouchableOpacity
-            style={{ color: "#007BFF", fontSize: 14, alignItems: 'center', marginTop: 5 }}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Text style={{ color: "#007BFF", fontSize: 14 }}>Já tenho uma conta</Text>
-          </TouchableOpacity>
-        )}
-        <Text style={[styles.terms, isLargeScreen && styles.termsLarge]}>
-          Ao criar uma conta, você concorda com nossos Termos e Condições.
-        </Text>
+              <Text style={{ color: "#007BFF", fontSize: 14 }}>
+                Já tenho uma conta
+              </Text>
+            </TouchableOpacity>
+          )}
+          <Text style={[styles.terms, isLargeScreen && styles.termsLarge]}>
+            Ao criar uma conta, você concorda com nossos Termos e Condições.
+          </Text>
+        </View>
       </ScrollView>
     );
   };
@@ -234,6 +247,22 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fdd835",
     justifyContent: "center",
+  },
+  containerLarge: {
+    alignItems: "center",
+  },
+  formContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  formContainerLarge: {
+    width: 600,
   },
   title: {
     fontSize: 24,
