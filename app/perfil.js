@@ -8,13 +8,20 @@ import {
   StyleSheet,
   Linking,
   ScrollView,
+  Picker,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { editarUsuario } from '../api/services/userService';
 
 const ProfileScreen = () => {
-  const [name, setName] = useState('João Silva');
-  const [bio, setBio] = useState('Amante de tecnologia e café ☕🚀');
-  const [profileImage, setProfileImage] = useState('https://i.pravatar.cc/300');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [genero, setGenero] = useState('');
+  const [pais, setPais] = useState('');
+  const [cep, setCep] = useState('');
+  const [profileImage, setProfileImage] = useState('https://i.pinimg.com/236x/21/9e/ae/219eaea67aafa864db091919ce3f5d82.jpg');
 
   const handleChoosePhoto = () => {
     launchImageLibrary(
@@ -50,6 +57,41 @@ const ProfileScreen = () => {
       link: 'https://www.tudogostoso.com.br/receita/179648-panqueca-fit.html',
     },
   ];
+  const handleSalvarPerfil = async () => {
+    if (
+      !name ||
+      !email ||
+      !telefone ||
+      !cidade ||
+      !pais ||
+      !genero ||
+      !cep
+    ) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      const user = {
+        name,
+        email,
+        telefone,
+        cidade,
+        genero,
+        pais,
+        cep,
+      };
+
+      const data = await editarUsuario(JSON.stringify(user));
+      console.log(data);
+
+      limparCampos();
+      alert("Perfil atualizado com sucesso!");
+    } catch (error) {
+      alert(error?.response?.data?.error || "Erro ao registrar!");
+      console.error(error);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -65,17 +107,62 @@ const ProfileScreen = () => {
         placeholder="Digite seu nome"
       />
 
-      <Text style={styles.label}>Bio:</Text>
+      <Text style={styles.label}>Email:</Text>
       <TextInput
-        style={[styles.input, styles.bioInput]}
-        value={bio}
-        onChangeText={setBio}
-        placeholder="Fale sobre você"
-        multiline
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Digite seu email"
       />
 
-      <TouchableOpacity style={styles.editButton} onaPress={() => alert('Perfil atualizado!')}>
-        <Text style={styles.editButtonText}>salvar perfil</Text>
+      <Text style={styles.label}>Telefone:</Text>
+      <TextInput
+        style={styles.input}
+        value={telefone}
+        onChangeText={setTelefone}
+        placeholder="Digite seu telefone"
+        keyboardType="numeric"
+      />
+
+      <Text style={styles.label}>Cidade:</Text>
+      <TextInput
+        style={styles.input}
+        value={cidade}
+        onChangeText={setCidade}
+        placeholder="Digite sua cidade"
+      />
+      <Text style={styles.label}>Gênero:</Text>
+      <Picker
+        selectedValue={genero}
+        style={styles.picker}
+        onValueChange={(itemValue) => setGenero(itemValue)}
+      >
+        <Picker.Item label="Selecione seu Gênero" value="" />
+        <Picker.Item label="Masculino" value="masculino" />
+        <Picker.Item label="Feminino" value="feminino" />
+        <Picker.Item label="Outro" value="outro" />
+      </Picker>
+
+      <Text style={styles.label}>País:</Text>
+      <TextInput
+        style={styles.input}
+        value={pais}
+        onChangeText={setPais}
+        placeholder="Digite seu país"
+      />
+
+      <Text style={styles.label}>Cep:</Text>
+      <TextInput
+        style={styles.input}
+        value={cep}
+        onChangeText={setCep}
+        placeholder="Digite seu CEP"
+        keyboardType="numeric"
+      />
+
+
+      <TouchableOpacity style={styles.editButton}>
+        <Text style={styles.editButtonText}>Salvar perfil</Text>
       </TouchableOpacity>
 
       {/* TABELA DE RECEITAS */}
@@ -87,7 +174,8 @@ const ProfileScreen = () => {
           <Text style={styles.tableCellHeader}>Nome</Text>
           <Text style={styles.tableCellHeader}>Tempo</Text>
           <Text style={styles.tableCellHeader}>Dificuldade</Text>
-          <Text style={styles.tableCellHeader}>Ação</Text>
+          <Text style={styles.tableCellHeader}>Visualizar</Text>
+          <Text style={styles.tableCellHeader}>Editar</Text>
         </View>
 
         {receitas.map((item) => (
@@ -101,7 +189,15 @@ const ProfileScreen = () => {
             >
               Ver
             </Text>
+            <Text
+              style={[styles.tableCell, styles.link]}
+              onPress={() => alert(`Editar receita: ${item.nome}`)}
+            >Editar
+            </Text>
           </View>
+
+
+
         ))}
       </View>
     </ScrollView>
@@ -142,6 +238,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
+
+  picker: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 10,
+    fontSize: 16,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+
+
   bioInput: {
     height: 80,
     textAlignVertical: 'top',
