@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,10 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { login } from "../api/services/authService";
+import { getUserById } from "../api/services/userService";
 import { Link, useNavigate } from "react-router-native";
+import { UserContext } from "../context/userContext";
+import checkUserAccess from "../utils/checkUserAccess";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +26,9 @@ const LoginScreen = () => {
 
 
   const navigate = useNavigate();
+
+  const { login_user, user } = useContext(UserContext);
+
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -38,7 +44,17 @@ const LoginScreen = () => {
         await AsyncStorage.setItem("authToken", data.token);
       }
 
-      navigate("/");
+      const userDecoded = checkUserAccess();
+
+      const data2 = await getUserById(userDecoded.id);
+
+      await AsyncStorage.setItem("user", data2);
+      login_user(data2);
+
+      console.log(user);
+      
+
+      //navigate("/");
 
       limparCampos();
     } catch (error) {

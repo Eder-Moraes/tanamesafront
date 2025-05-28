@@ -4,7 +4,8 @@ const endpoints = {
     requestRecuperacao: '/password-reset/request',
     redefinirSenha: '/password-reset/reset',
     receitas: '/receitas',
-    users: '/users'
+    users: '/users',
+    avaliacoes: '/avaliacoes'
 };
 
 export default endpoints;

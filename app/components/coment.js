@@ -10,6 +10,11 @@ import {
 } from "react-native";
 import StarRating from "./Avalia";
 import { UserContext } from "../../context/userContext";
+import {
+  getAvaliacaoByReceita,
+  register,
+} from "../../api/services/AvaliacaoService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Simulando uma API com comentários de outras pessoas
 const comentariosMock = [
@@ -42,23 +47,70 @@ const Comentarios = ({
   const [comentario, setComentario] = useState("");
   const [listaComentarios, setListaComentarios] = useState([]);
   const [avalia, setAvalia] = useState("");
+  const [visible, setVisible] = useState(true);
 
-  const { user } = useContext(UserContext);
+  const BASE_URL = "http://localhost:8080"; // troque pelo seu IP
+
+  const fechAvaliacoes = async () => {
+    const userString = await AsyncStorage.getItem("user");
+    const user = JSON.parse(userString);
+
+    try {
+      const data = await getAvaliacaoByReceita(id_receita);
+      console.log(user);
+
+      const novosComentarios = data.map((avaliacao) => {
+        if (avaliacao.autor.id === user?.id) setVisible(false);
+        return {
+          id: Date.now().toString() + Math.random().toString(36).substring(2), // ID único
+          autor: avaliacao.autor?.name ?? "Usuário",
+          texto: avaliacao.conteudo,
+          imagem: `${BASE_URL}/files/images/${avaliacao.autor.pathImage}`,
+          rating: avaliacao.quantidade_estrela,
+        };
+      });
+
+      setListaComentarios(novosComentarios);
+    } catch (error) {
+      alert(error?.response?.data?.error || "Erro ao buscar avaliações!");
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    setListaComentarios(comentariosMock);
+    fechAvaliacoes();
   }, []);
 
-  const adicionarComentario = () => {
-    if (comentario.trim() !== "") {
-      const novoComentario = {
-        autor: user.id,
-        texto: comentario,
-        imagem: user.pathImage,
-        rating: avalia,
-      };
-      setListaComentarios([...listaComentarios, novoComentario]);
-      setComentario("");
+  const adicionarComentario = async () => {
+    try {
+      if (comentario.trim() !== "") {
+        const comentarioAdicionar = {
+          userId: user.id,
+          receitaId: id_receita,
+          conteudo: comentario,
+          quantidadeEstrela: avalia,
+        };
+
+        const data = await register(comentarioAdicionar);
+
+        const novoComentario = {
+          id: Date.now().toString(),
+          autor: user?.username ?? "Usuário",
+          texto: comentario,
+          imagem: `${BASE_URL}/files/images/${user.pathImage}`,
+          rating: avalia,
+        };
+        if (!Array.isArray(listaComentarios)) {
+          setListaComentarios([novoComentario]);
+        } else {
+          setListaComentarios([...listaComentarios, novoComentario]);
+        }
+
+        setComentario("");
+      }
+    } catch (error) {
+      alert(error?.response?.data?.error || "Erro ao enviar!");
+      console.error(error);
     }
   };
 
@@ -71,18 +123,20 @@ const Comentarios = ({
         width: largura,
       }}
     >
-      <Text style={styles.title}>Avaliação</Text>
-      <StarRating onRatingChange={(estrelas) => setAvalia(estrelas)} />
-      <TextInput
-        style={styles.input}
-        placeholder="Digite seu comentário..."
-        value={comentario}
-        onChangeText={(texto) => setComentario(texto)}
-      />
+      <View style={{ display: visible ? "flex" : "none" }}>
+        <Text style={styles.title}>Avaliação</Text>
+        <StarRating onRatingChange={(estrelas) => setAvalia(estrelas)} />
+        <TextInput
+          style={styles.input}
+          placeholder="Digite seu comentário..."
+          value={comentario}
+          onChangeText={(texto) => setComentario(texto)}
+        />
 
-      <TouchableOpacity style={styles.botao} onPress={adicionarComentario}>
-        <Text style={styles.botaoTexto}>Enviar</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.botao} onPress={adicionarComentario}>
+          <Text style={styles.botaoTexto}>Enviar</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Área de comentários com tamanho fixo e scroll interno */}
       <View style={styles.areaComentarios}>
