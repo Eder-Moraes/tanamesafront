@@ -23,6 +23,7 @@ export const UserProvider = ({ children }) => {
   const login_user = async (userInfo) => {
     setUser(userInfo);
     await AsyncStorage.setItem("user", JSON.stringify(userInfo));
+    console.log(user);
   };
 
   const logout = async () => {

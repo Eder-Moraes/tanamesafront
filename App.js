@@ -23,7 +23,6 @@ function WebNavigation() {
     <BrowserRouter>
       {" "}
       {/* Para Web */}
-      <UserProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cadastro" element={<CadastroScreen />} />
@@ -34,7 +33,6 @@ function WebNavigation() {
           <Route path="/perfil" element={<ProfileScreen />}></Route>
           <Route path="/receitas" element={<Receita />}></Route>
         </Routes>
-      </UserProvider>
     </BrowserRouter>
   );
 }
@@ -42,7 +40,6 @@ function WebNavigation() {
 // Navegação para mobile (iOS/Android) usando react-navigation
 function MobileNavigation() {
   return (
-    <UserProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
           <Stack.Screen
@@ -72,10 +69,10 @@ function MobileNavigation() {
           />
       </Stack.Navigator>
     </NavigationContainer>
-    </UserProvider>
   );
 }
 
 export default function App() {
-  return Platform.OS === "web" ? <WebNavigation /> : <MobileNavigation />;
+  return Platform.OS === "web" ? (<UserProvider><WebNavigation /></UserProvider>) 
+  : (<UserProvider><MobileNavigation /></UserProvider>);
 }

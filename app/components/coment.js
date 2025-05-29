@@ -15,6 +15,7 @@ import {
   register,
 } from "../../api/services/AvaliacaoService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { buscarUser } from "../../utils/diversos";
 
 // Simulando uma API com comentários de outras pessoas
 const comentariosMock = [
@@ -46,21 +47,24 @@ const Comentarios = ({
 }) => {
   const [comentario, setComentario] = useState("");
   const [listaComentarios, setListaComentarios] = useState([]);
-  const [avalia, setAvalia] = useState("");
+  const [avalia, setAvalia] = useState(0);
   const [visible, setVisible] = useState(true);
 
   const BASE_URL = "http://localhost:8080"; // troque pelo seu IP
 
   const fechAvaliacoes = async () => {
-    const userString = await AsyncStorage.getItem("user");
-    const user = JSON.parse(userString);
-
     try {
-      const data = await getAvaliacaoByReceita(id_receita);
+      const user = await buscarUser();
+      console.log("User agora: ");
       console.log(user);
 
+      const data = await getAvaliacaoByReceita(id_receita);
+
       const novosComentarios = data.map((avaliacao) => {
-        if (avaliacao.autor.id === user?.id) setVisible(false);
+        if (avaliacao.autor.id === user?.id) {
+          setAvalia(avaliacao.quantidade_estrela);
+          setComentario(avaliacao.conteudo);
+        }
         return {
           id: Date.now().toString() + Math.random().toString(36).substring(2), // ID único
           autor: avaliacao.autor?.name ?? "Usuário",
@@ -83,6 +87,7 @@ const Comentarios = ({
 
   const adicionarComentario = async () => {
     try {
+      const user = await buscarUser();
       if (comentario.trim() !== "") {
         const comentarioAdicionar = {
           userId: user.id,
@@ -103,7 +108,10 @@ const Comentarios = ({
         if (!Array.isArray(listaComentarios)) {
           setListaComentarios([novoComentario]);
         } else {
-          setListaComentarios([...listaComentarios, novoComentario]);
+          const comentariosSemDoUsuario = listaComentarios.filter(
+            (avaliacao) => avaliacao.autor !== user?.username // ou `avaliacao.autor.id !== user?.id` se tiver ID
+          );
+          setListaComentarios([...comentariosSemDoUsuario, novoComentario]);
         }
 
         setComentario("");
@@ -125,7 +133,10 @@ const Comentarios = ({
     >
       <View style={{ display: visible ? "flex" : "none" }}>
         <Text style={styles.title}>Avaliação</Text>
-        <StarRating onRatingChange={(estrelas) => setAvalia(estrelas)} />
+        <StarRating
+          onRatingChange={(estrelas) => setAvalia(estrelas)}
+          initial_estrela={avalia}
+        />
         <TextInput
           style={styles.input}
           placeholder="Digite seu comentário..."
