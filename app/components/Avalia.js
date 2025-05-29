@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-const StarRating = ({ onRatingChange }) => {
-  const [rating, setRating] = useState(0);
+const StarRating = ({ onRatingChange, initial_estrela }) => {
+  const [rating, setRating] = useState(initial_estrela);
+
+  useEffect(() => {
+    setRating(initial_estrela); // Atualiza se a prop mudar
+  }, [initial_estrela]);
 
   const mandaAva = (estrelas) => {
     setRating(estrelas);

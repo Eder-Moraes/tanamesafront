@@ -24,11 +24,9 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-
   const navigate = useNavigate();
 
   const { login_user, user } = useContext(UserContext);
-
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -48,13 +46,13 @@ const LoginScreen = () => {
 
       const data2 = await getUserById(userDecoded.id);
 
-      await AsyncStorage.setItem("user", data2);
-      login_user(data2);
+      // Corrigir aqui:
+      await AsyncStorage.setItem("user", JSON.stringify(data2));
+      login_user(data2); // Correto, passa o objeto real para o contexto
 
-      console.log(user);
-      
+      console.log(user); // Lembre que esse log vai mostrar null porque o setUser ainda não atualizou nesse momento
 
-      //navigate("/");
+      navigate("/");
 
       limparCampos();
     } catch (error) {
@@ -106,10 +104,7 @@ const LoginScreen = () => {
         />
 
         {Platform.OS === "web" ? (
-          <Link
-            to="/cadastro"
-            style={{ marginTop: 15, marginBottom: 5 }}
-          >
+          <Link to="/cadastro" style={{ marginTop: 15, marginBottom: 5 }}>
             <Text style={styles.link}>Criar conta</Text>
           </Link>
         ) : (
@@ -146,7 +141,6 @@ const LoginScreen = () => {
       </View>
     </View>
   );
-
 
   return Platform.OS === "web" ? (
     renderContent()
