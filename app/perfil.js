@@ -195,10 +195,35 @@ const ProfileScreen = () => {
             >Editar
             </Text>
           </View>
-
-
-
         ))}
+
+        {/* TABELA DE FAVORITAS */}
+        <Text style={[styles.label, { marginTop: 30, textAlign: 'center' }]}>
+          Favoritas:
+        </Text>
+        <View style={styles.table}>
+          <View style={[styles.tableRow, styles.tableHeader]}>
+            <Text style={styles.tableCellHeader}>Nome</Text>
+            <Text style={styles.tableCellHeader}>Tempo</Text>
+            <Text style={styles.tableCellHeader}>Dificuldade</Text>
+            <Text style={styles.tableCellHeader}>Visualizar</Text>
+          </View>
+
+          {receitas.map((item) => (
+            <View key={`favorita-${item.id}`} style={styles.tableRow}>
+              <Text style={styles.tableCell}>{item.nome}</Text>
+              <Text style={styles.tableCell}>{item.tempo}</Text>
+              <Text style={styles.tableCell}>{item.dificuldade}</Text>
+              <Text
+                style={[styles.tableCell, styles.link]}
+                onPress={() => Linking.openURL(item.link)}
+              >
+                Ver
+              </Text>
+            </View>
+          ))}
+        </View>
+
       </View>
     </ScrollView>
   );
@@ -209,7 +234,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#F4BD37',
     alignItems: 'center',
   },
   profileImage: {
@@ -218,7 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 70,
     marginBottom: 20,
     borderWidth: 2,
-    borderColor: '#4CAF50',
+    borderColor: '#964B00',
   },
   label: {
     alignSelf: 'flex-start',
@@ -249,14 +274,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-
-
   bioInput: {
     height: 80,
     textAlignVertical: 'top',
   },
   editButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#964B00',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
@@ -299,7 +322,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   link: {
-    color: '#4CAF50',
+    color: '#964B00',
     textDecorationLine: 'underline',
   },
 });
