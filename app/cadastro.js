@@ -1,12 +1,26 @@
-import React, { useState } from "react";
-import {StyleSheet,TextInput, View, Text, Button,TouchableOpacity, Platform, TouchableWithoutFeedback, KeyboardAvoidingView, 
-ScrollView, Keyboard, useWindowDimensions,
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  Text,
+  Button,
+  TouchableOpacity,
+  Platform,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  ScrollView,
+  Keyboard,
+  useWindowDimensions,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { register } from "../api/services/authService";
 import { Link } from "react-router-native";
+import axios from "axios";
 
 const CadastroScreen = ({ navigation }) => {
+  const [paises, setPaises] = useState([]);
+  const [cidades, setCidades] = useState([]);
   const [nome, setNome] = useState("");
   const [gmail, setGmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -20,6 +34,31 @@ const CadastroScreen = ({ navigation }) => {
 
   const { width } = useWindowDimensions();
   const isLargeScreen = width >= 768;
+
+  useEffect(() => {
+    axios
+      .get("https://countriesnow.space/api/v0.1/countries/positions")
+      .then((response) => {
+        const countryNames = response.data.data.map((country) => country.name);
+        setPaises(countryNames);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar países:", error);
+      });
+  }, []);
+
+  const buscarCidades = (paisSelecionado) => {
+    axios
+      .post("https://countriesnow.space/api/v0.1/countries/cities", {
+        country: paisSelecionado,
+      })
+      .then((response) => {
+        setCidades(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar cidades:", error);
+      });
+  };
 
   const limparCampos = () => {
     setNome("");
@@ -99,10 +138,7 @@ const CadastroScreen = ({ navigation }) => {
           </Text>
 
           <View
-            style={[
-              styles.inputGroup,
-              isLargeScreen && styles.inputGroupLarge,
-            ]}
+            style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
           >
             <TextInput
               style={[styles.input, isLargeScreen && styles.inputLarge]}
@@ -120,10 +156,7 @@ const CadastroScreen = ({ navigation }) => {
           </View>
 
           <View
-            style={[
-              styles.inputGroup,
-              isLargeScreen && styles.inputGroupLarge,
-            ]}
+            style={[styles.inputGroup, isLargeScreen && styles.inputGroupLarge]}
           >
             <TextInput
               style={[styles.input, isLargeScreen && styles.inputLarge]}
@@ -148,31 +181,32 @@ const CadastroScreen = ({ navigation }) => {
             onChangeText={setTelefone}
             keyboardType="phone-pad"
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Sua Cidade"
-            value={cidade}
-            onChangeText={setCidade}
-          />
-          <Picker
-            selectedValue={genero}
-            style={styles.picker}
-            onValueChange={(itemValue) => setGenero(itemValue)}
-          >
-            <Picker.Item label="Selecione seu Gênero (Opcional)" value="" />
-            <Picker.Item label="Masculino" value="masculino" />
-            <Picker.Item label="Feminino" value="feminino" />
-            <Picker.Item label="Outro" value="outro" />
-          </Picker>
           <Picker
             selectedValue={pais}
-            style={styles.picker}
-            onValueChange={(itemValue) => setPais(itemValue)}
+            style={styles.input}
+            onValueChange={(itemValue) => {
+              setPais(itemValue);
+              buscarCidades(itemValue);
+            }}
           >
-            <Picker.Item label="Selecione seu País (Opcional)" value="" />
-            <Picker.Item label="Brasil" value="brasil" />
-            <Picker.Item label="Outro" value="outro" />
+            <Picker.Item label="Selecione seu País" value="" />
+            {paises.map((paisNome, index) => (
+              <Picker.Item key={index} label={paisNome} value={paisNome} />
+            ))}
           </Picker>
+
+          <Picker
+            selectedValue={cidade}
+            style={styles.input}
+            onValueChange={(itemValue) => setCidade(itemValue)}
+            enabled={cidades.length > 0}
+          >
+            <Picker.Item label="Selecione sua Cidade" value="" />
+            {cidades.map((cidadeNome, index) => (
+              <Picker.Item key={index} label={cidadeNome} value={cidadeNome} />
+            ))}
+          </Picker>
+
           <TextInput
             style={styles.input}
             placeholder="Seu CEP (Opcional)"

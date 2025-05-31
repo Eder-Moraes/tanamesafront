@@ -67,11 +67,16 @@ const Comentarios = ({
           setAvalia(avaliacao.quantidadeEstrela);
           setComentario(avaliacao.conteudo);
         }
+
+        const linkImage = avaliacao.autor.pathImage ? 
+          `${BASE_URL}/files/images/${avaliacao.autor.pathImage}` 
+          : 'https://i.pinimg.com/236x/21/9e/ae/219eaea67aafa864db091919ce3f5d82.jpg';
+
         return {
           id: avaliacao.autor?.id || Date.now().toString() + Math.random().toString(36).substring(2), // ID único
           autor: avaliacao.autor?.username ?? "Usuário",
           texto: avaliacao.conteudo,
-          imagem: `${BASE_URL}/files/images/${avaliacao.autor.pathImage}`,
+          imagem: linkImage,
           rating: avaliacao.quantidadeEstrela,
         };
       });

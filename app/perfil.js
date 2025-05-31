@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,74 +6,164 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Linking,
   ScrollView,
-  Picker,
-} from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { editarUsuario } from '../api/services/userService';
+  FlatList,
+  Platform,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import { launchImageLibrary } from "react-native-image-picker";
+import axios from "axios";
+import { editarUsuario, updateImagePerfil } from "../api/services/userService";
+import { buscarUser } from "../utils/diversos";
+import { getReceitaByUserId } from "../api/services/receitaService";
+import { useNavigate, useNavigation } from "react-router-native";
+import { getFavoritosByUserId } from "../api/services/listaFavoritoService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [genero, setGenero] = useState('');
-  const [pais, setPais] = useState('');
-  const [cep, setCep] = useState('');
-  const [profileImage, setProfileImage] = useState('https://i.pinimg.com/236x/21/9e/ae/219eaea67aafa864db091919ce3f5d82.jpg');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [genero, setGenero] = useState("");
+  const [pais, setPais] = useState("");
+  const [cep, setCep] = useState("");
+  const [profileImage, setProfileImage] = useState(
+    "https://i.pinimg.com/236x/21/9e/ae/219eaea67aafa864db091919ce3f5d82.jpg"
+  );
+  const [imagemArquivo, setImagemArquivo] = useState(null);
 
-  const handleChoosePhoto = () => {
-    launchImageLibrary(
-      { mediaType: 'photo', quality: 1 },
-      (response) => {
-        if (response.assets && response.assets.length > 0) {
-          setProfileImage(response.assets[0].uri);
+  const [paises, setPaises] = useState([]);
+  const [cidades, setCidades] = useState([]);
+
+  const [receitas, setReceitas] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
+
+  const navigation = useNavigate();
+
+  const clicado = async () => {
+    try {
+      const response = await launchImageLibrary({
+        mediaType: "photo",
+        quality: 1,
+        includeBase64: false,
+      });
+
+      if (response.didCancel) {
+        console.log("Usuário cancelou a seleção de imagem");
+        return;
+      }
+
+      if (response.assets && response.assets.length > 0) {
+        const asset = response.assets[0];
+        setProfileImage(response.assets[0].uri);
+
+        if (Platform.OS === "web") {
+          const blob = await fetch(asset.uri).then((res) => res.blob());
+          const file = new File([blob], asset.fileName || "imagem.jpg", {
+            type: blob.type,
+          });
+          setImagemArquivo(file);
+        } else {
+          setImagemArquivo({
+            uri: asset.uri,
+            type: asset.type,
+            name: asset.fileName || "imagem.jpg",
+          });
         }
       }
-    );
+    } catch (error) {
+      console.log("Erro ao selecionar imagem:", error);
+    }
   };
 
-  const receitas = [
-    {
-      id: 1,
-      nome: 'Bolo de Cenoura',
-      tempo: '45 min',
-      dificuldade: 'Fácil',
-      link: 'https://www.tudogostoso.com.br/receita/62544-bolo-de-cenoura.html',
-    },
-    {
-      id: 2,
-      nome: 'Feijoada',
-      tempo: '2h',
-      dificuldade: 'Difícil',
-      link: 'https://www.tudogostoso.com.br/receita/8761-feijoada.html',
-    },
-    {
-      id: 3,
-      nome: 'Panqueca Fit',
-      tempo: '20 min',
-      dificuldade: 'Normal',
-      link: 'https://www.tudogostoso.com.br/receita/179648-panqueca-fit.html',
-    },
-  ];
+  const handleSaveImage = async () => {
+        if (!profileImage) return console.log('Nenhuma imagem selecionada para upload.');
+
+        const formData = new FormData();
+        formData.append("file", imagemArquivo);
+
+        try {
+            const data = await updateImagePerfil(formData);
+            await AsyncStorage.setItem("user", JSON.stringify(data));
+            console.log('Imagem salva com sucesso:', data);
+        } catch (error) {
+            console.error('Erro ao salvar imagem:', error);
+        }
+    };
+
+  const carregarPaises = async () => {
+    try {
+      const response = await axios.get(
+        "https://countriesnow.space/api/v0.1/countries/positions"
+      );
+      setPaises(response.data.data.map((p) => p.name));
+    } catch (error) {
+      console.error("Erro ao carregar países", error);
+    }
+  };
+
+  const carregarCidades = async (paisSelecionado) => {
+    try {
+      const response = await axios.post(
+        "https://countriesnow.space/api/v0.1/countries/cities",
+        {
+          country: paisSelecionado,
+        }
+      );
+      setCidades(response.data.data);
+    } catch (error) {
+      console.error("Erro ao carregar cidades", error);
+    }
+  };
+
+  const fetchUser = async () => {
+    try {
+      const user = await buscarUser();
+      if (user.pathImage) setProfileImage(`http://localhost:8080/files/images/${user.pathImage}`);
+      setName(user.username);
+      setEmail(user.email);
+      setTelefone(user.telefone);
+      setGenero(user.genero);
+      setPais(user.pais);
+      setCep(user.cep);
+      setCidade(user.cidade);
+
+      await carregarPaises();
+      if (user.pais) await carregarCidades(user.pais);
+
+      const receitasUsuario = await getReceitaByUserId(user.id);
+      setReceitas(receitasUsuario);
+
+      const receitasFavoritas = await getFavoritosByUserId(user.id);
+      setFavoritos(receitasFavoritas);
+    } catch (error) {
+      console.error("Erro ao buscar usuário ou dados", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  useEffect(()=>{
+    console.log(imagemArquivo);
+    
+  }, [imagemArquivo])
+
+  useEffect(() => {
+    if (pais) carregarCidades(pais);
+  }, [pais]);
+
   const handleSalvarPerfil = async () => {
-    if (
-      !name ||
-      !email ||
-      !telefone ||
-      !cidade ||
-      !pais ||
-      !genero ||
-      !cep
-    ) {
+    if (!name || !email || !telefone || !cidade || !pais || !genero || !cep) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
     try {
       const user = {
-        name,
+        username: name,
         email,
         telefone,
         cidade,
@@ -82,20 +172,39 @@ const ProfileScreen = () => {
         cep,
       };
 
-      const data = await editarUsuario(JSON.stringify(user));
-      console.log(data);
-
-      limparCampos();
+      const userUpt = await editarUsuario(JSON.stringify(user));
+      await AsyncStorage.setItem("user", JSON.stringify(userUpt));
+      handleSaveImage();
       alert("Perfil atualizado com sucesso!");
     } catch (error) {
-      alert(error?.response?.data?.error || "Erro ao registrar!");
+      alert(error?.response?.data?.error || "Erro ao editar!");
       console.error(error);
     }
   };
 
+  const renderReceita = ({ item }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => navigation(`/receitas?idReceita=${item.id}`)}
+    >
+      <Text style={styles.itemTitle}>{item.titulo}</Text>
+      <Text style={styles.itemDesc}>{item.descricao}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderFavorito = ({ item }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => navigation(`/receitas?idReceita=${item?.id}`)}
+    >
+      <Text style={styles.itemTitle}>{item?.titulo}</Text>
+      <Text style={styles.itemDesc}>{item?.descricao}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity onPress={handleChoosePhoto}>
+      <TouchableOpacity onPress={clicado}>
         <Image source={{ uri: profileImage }} style={styles.profileImage} />
       </TouchableOpacity>
 
@@ -107,14 +216,6 @@ const ProfileScreen = () => {
         placeholder="Digite seu nome"
       />
 
-      <Text style={styles.label}>Email:</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Digite seu email"
-      />
-
       <Text style={styles.label}>Telefone:</Text>
       <TextInput
         style={styles.input}
@@ -124,18 +225,11 @@ const ProfileScreen = () => {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Cidade:</Text>
-      <TextInput
-        style={styles.input}
-        value={cidade}
-        onChangeText={setCidade}
-        placeholder="Digite sua cidade"
-      />
       <Text style={styles.label}>Gênero:</Text>
       <Picker
         selectedValue={genero}
-        style={styles.picker}
-        onValueChange={(itemValue) => setGenero(itemValue)}
+        style={styles.input}
+        onValueChange={setGenero}
       >
         <Picker.Item label="Selecione seu Gênero" value="" />
         <Picker.Item label="Masculino" value="masculino" />
@@ -144,14 +238,26 @@ const ProfileScreen = () => {
       </Picker>
 
       <Text style={styles.label}>País:</Text>
-      <TextInput
-        style={styles.input}
-        value={pais}
-        onChangeText={setPais}
-        placeholder="Digite seu país"
-      />
+      <Picker selectedValue={pais} style={styles.input} onValueChange={setPais}>
+        <Picker.Item label="Selecione um país" value="" />
+        {paises.map((item) => (
+          <Picker.Item key={item} label={item} value={item} />
+        ))}
+      </Picker>
 
-      <Text style={styles.label}>Cep:</Text>
+      <Text style={styles.label}>Cidade:</Text>
+      <Picker
+        selectedValue={cidade}
+        style={styles.input}
+        onValueChange={setCidade}
+      >
+        <Picker.Item label="Selecione uma cidade" value="" />
+        {cidades.map((item) => (
+          <Picker.Item key={item} label={item} value={item} />
+        ))}
+      </Picker>
+
+      <Text style={styles.label}>CEP:</Text>
       <TextInput
         style={styles.input}
         value={cep}
@@ -160,70 +266,30 @@ const ProfileScreen = () => {
         keyboardType="numeric"
       />
 
-
-      <TouchableOpacity style={styles.editButton}>
+      <TouchableOpacity style={styles.editButton} onPress={handleSalvarPerfil}>
         <Text style={styles.editButtonText}>Salvar perfil</Text>
       </TouchableOpacity>
 
-      {/* TABELA DE RECEITAS */}
-      <Text style={[styles.label, { marginTop: 30, textAlign: 'center' }]}>
-        Minhas Receitas:
-      </Text>
-      <View style={styles.table}>
-        <View style={[styles.tableRow, styles.tableHeader]}>
-          <Text style={styles.tableCellHeader}>Nome</Text>
-          <Text style={styles.tableCellHeader}>Tempo</Text>
-          <Text style={styles.tableCellHeader}>Dificuldade</Text>
-          <Text style={styles.tableCellHeader}>Visualizar</Text>
-          <Text style={styles.tableCellHeader}>Editar</Text>
-        </View>
+      {/* Minhas Receitas */}
+      <Text style={styles.sectionTitle}>Minhas Receitas</Text>
+      <View style={styles.scrollContainer}>
+        <FlatList
+          data={receitas}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderReceita}
+          nestedScrollEnabled
+        />
+      </View>
 
-        {receitas.map((item) => (
-          <View key={item.id} style={styles.tableRow}>
-            <Text style={styles.tableCell}>{item.nome}</Text>
-            <Text style={styles.tableCell}>{item.tempo}</Text>
-            <Text style={styles.tableCell}>{item.dificuldade}</Text>
-            <Text
-              style={[styles.tableCell, styles.link]}
-              onPress={() => Linking.openURL(item.link)}
-            >
-              Ver
-            </Text>
-            <Text
-              style={[styles.tableCell, styles.link]}
-              onPress={() => alert(`Editar receita: ${item.nome}`)}
-            >Editar
-            </Text>
-          </View>
-        ))}
-
-        {/* TABELA DE FAVORITAS */}
-        <Text style={[styles.label, { marginTop: 30, textAlign: 'center' }]}>
-          Favoritas:
-        </Text>
-        <View style={styles.table}>
-          <View style={[styles.tableRow, styles.tableHeader]}>
-            <Text style={styles.tableCellHeader}>Nome</Text>
-            <Text style={styles.tableCellHeader}>Tempo</Text>
-            <Text style={styles.tableCellHeader}>Dificuldade</Text>
-            <Text style={styles.tableCellHeader}>Visualizar</Text>
-          </View>
-
-          {receitas.map((item) => (
-            <View key={`favorita-${item.id}`} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{item.nome}</Text>
-              <Text style={styles.tableCell}>{item.tempo}</Text>
-              <Text style={styles.tableCell}>{item.dificuldade}</Text>
-              <Text
-                style={[styles.tableCell, styles.link]}
-                onPress={() => Linking.openURL(item.link)}
-              >
-                Ver
-              </Text>
-            </View>
-          ))}
-        </View>
-
+      {/* Favoritos */}
+      <Text style={styles.sectionTitle}>Favoritos</Text>
+      <View style={styles.scrollContainer}>
+        <FlatList
+          data={favoritos}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderFavorito}
+          nestedScrollEnabled
+        />
       </View>
     </ScrollView>
   );
@@ -234,8 +300,8 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#F4BD37',
-    alignItems: 'center',
+    backgroundColor: "#F4BD37",
+    alignItems: "center",
   },
   profileImage: {
     width: 140,
@@ -243,86 +309,81 @@ const styles = StyleSheet.create({
     borderRadius: 70,
     marginBottom: 20,
     borderWidth: 2,
-    borderColor: '#964B00',
+    borderColor: "#964B00",
   },
   label: {
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
+    alignSelf: "flex-start",
+    marginLeft: "10%",
     marginBottom: 5,
     fontSize: 16,
-    color: '#333',
-    fontWeight: 'bold',
+    color: "#333",
+    fontWeight: "bold",
   },
   input: {
-    width: '80%',
-    backgroundColor: '#fff',
+    width: "80%",
+    backgroundColor: "#fff",
     padding: 12,
     borderRadius: 10,
     fontSize: 16,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
-
   picker: {
-    width: '80%',
-    backgroundColor: '#fff',
-    padding: 12,
+    width: "80%",
+    backgroundColor: "#fff",
     borderRadius: 10,
-    fontSize: 16,
     marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  bioInput: {
-    height: 80,
-    textAlignVertical: 'top',
   },
   editButton: {
-    backgroundColor: '#964B00',
+    backgroundColor: "#964B00",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
     marginTop: 15,
   },
   editButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-  table: {
-    width: '90%',
-    alignSelf: 'center',
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    overflow: 'hidden',
+  sectionTitle: {
+    marginTop: 25,
+    fontSize: 18,
+    fontWeight: "bold",
+    alignSelf: "flex-start",
+    marginLeft: "5%",
   },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+  scrollContainer: {
+    maxHeight: 200,
+    width: "90%",
+    marginVertical: 10,
   },
-  tableHeader: {
-    backgroundColor: '#e0e0e0',
+  item: {
+    backgroundColor: "#FFF8E7",
+    padding: 12,
+    marginBottom: 8,
+    borderRadius: 10,
   },
-  tableCell: {
-    flex: 1,
-    padding: 10,
+  itemTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  itemDesc: {
     fontSize: 14,
-    textAlign: 'center',
+    color: "#333",
   },
-  tableCellHeader: {
+  itemContent: {
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
-    padding: 10,
-    fontSize: 15,
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
-  link: {
-    color: '#964B00',
-    textDecorationLine: 'underline',
+  itemRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  editIcon: {
+    paddingHorizontal: 10,
+    justifyContent: "center",
   },
 });

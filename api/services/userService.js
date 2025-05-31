@@ -6,7 +6,16 @@ export const getUserById = async (id) => {
     return response.data;
 }
 
-export const editarUsuario = async (users) => {
-    const response = await api.put(endpoints.users);
+export const editarUsuario = async (userUpdateDTO) => {
+    const response = await api.put(endpoints.users, userUpdateDTO);
+    return response.data;
+}
+
+export const updateImagePerfil = async (form) => {
+    const response = await api.post(endpoints.users+'/uploadPerfilImage', form, {
+        headers: {
+            'Content-Type': "multipart/form-data",
+        }
+    });
     return response.data;
 }

@@ -14,12 +14,16 @@ import Comentarios from "./components/coment";
 import { getReceitaById } from "../api/services/receitaService";
 import { getUserById } from "../api/services/userService";
 import { buscarUser } from "../utils/diversos";
-import { adicionarFavorito, criarFavorito, removerFavorito, verificaFavorito } from "../api/services/listaFavoritoService";
+import {
+  adicionarFavorito,
+  criarFavorito,
+  removerFavorito,
+  verificaFavorito,
+} from "../api/services/listaFavoritoService";
 
 const receitaDefault = {
   nome: "Bolo de Chocolate",
-  imagem:
-    "receita-placeholder.png",
+  imagem: "receita-placeholder.png",
   descricao: "Um delicioso bolo de chocolate fofinho!",
   ingredientes: [
     "2 xícaras de farinha",
@@ -38,8 +42,7 @@ const receitaDefault = {
 
 const autorDefault = {
   username: "Pessoa",
-  pathImage:
-    "receita-placeholder.png",
+  pathImage: "receita-placeholder.png",
 };
 
 const abrirLink = (categoria) => {
@@ -57,8 +60,8 @@ const Receita = () => {
 
   const BASE_URL = "http://localhost:8080"; // troque pelo seu IP
 
-  const favorito = async() => {
-    if(!clicado){
+  const favorito = async () => {
+    if (!clicado) {
       try {
         const user = await buscarUser();
         const data = await adicionarFavorito(user.id, id_receita);
@@ -67,7 +70,7 @@ const Receita = () => {
         alert(error?.response?.data?.error || "Erro ao favoritar receita!");
         console.error(error);
       }
-    } else{
+    } else {
       try {
         const user = await buscarUser();
         const data = await removerFavorito(user.id, id_receita);
@@ -95,23 +98,23 @@ const Receita = () => {
     }
   };
 
-  const verifyFavorito = async() => {
+  const verifyFavorito = async () => {
     try {
-        const user = await buscarUser();
-        const data = await verificaFavorito(user.id, id_receita);
-        setClicado(data);
-      } catch (error) {
-        alert(error?.response?.data?.error || "Erro ao buscar receita!");
-        console.error(error);
-      }
-  }
+      const user = await buscarUser();
+      const data = await verificaFavorito(user.id, id_receita);
+      setClicado(data);
+    } catch (error) {
+      alert(error?.response?.data?.error || "Erro ao buscar receita!");
+      console.error(error);
+    }
+  };
 
-  const verifyAutor = async(autor) => {
+  const verifyAutor = async (autor) => {
     const user = await buscarUser();
     console.log(user);
-    
+
     setVisible(autor.id !== user.id);
-  }
+  };
 
   useEffect(() => {
     fetchReceita(id_receita);
@@ -123,17 +126,24 @@ const Receita = () => {
       <ScrollView style={styles.scroll}>
         {/* Autor */}
         <View style={styles.autor}>
-          <Image
-            source={{
-              uri: `${BASE_URL}/files/images/${
-                autor.pathImage || autorDefault.pathImage
-              }`,
-            }}
-            style={styles.imagemAutor}
-          />
+          {autor.pathImage ? (
+            <Image
+              source={{
+                uri: `${BASE_URL}/files/images/${
+                  autor.pathImage || autorDefault.pathImage
+                }`,
+              }}
+              style={styles.imagemAutor}
+            />
+          ) : (
+            <Image
+              source="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+              style={styles.imagemAutor}
+            />
+          )}
 
           <Text style={styles.boldAutor}>
-            Autor: <Text style={styles.textoAutor}>{autor.username}</Text>
+            <Text style={styles.textoAutor}>{autor.username}</Text>
           </Text>
         </View>
 
@@ -159,16 +169,25 @@ const Receita = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{display: visible ? 'flex':'none'}}>
-        <View style={styles.gosto}>
-          {/* Botão de favorito */}
-          <TouchableOpacity onPress={favorito}>
-            <Text style={clicado ? styles.selecionado : styles.nSelecionado}>
-              {"♥"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        </View>
+        {visible ? (
+          // Botão de favorito
+          <View style={styles.gosto}>
+            <TouchableOpacity onPress={favorito}>
+              <Text style={clicado ? styles.selecionado : styles.nSelecionado}>
+                {"♥"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          // Botão de editar (vai para /editar-receita?idReceita=...)
+          <View style={styles.gosto}>
+            <TouchableOpacity
+              onPress={() => navigate(`/editar-receita?idReceita=${id_receita}`)}
+            >
+              <Text style={styles.editarIconeButton}>✎</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Descrição */}
         <View style={styles.quadrado}>
@@ -206,7 +225,12 @@ const Receita = () => {
 
         {/* Campo de comentários */}
         <View style={styles.coment}>
-          <Comentarios largura={"95%"} corFundo={"#ebd1bc"} id_receita={id_receita} visibleAutor={visible}/>
+          <Comentarios
+            largura={"95%"}
+            corFundo={"#ebd1bc"}
+            id_receita={id_receita}
+            visibleAutor={visible}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -322,6 +346,11 @@ const styles = StyleSheet.create({
   },
   coment: {
     alignItems: "center",
+  },
+  editarIconeButton: {
+    fontSize: 50,
+    color: "#333",
+    paddingHorizontal: 10,
   },
 });
 

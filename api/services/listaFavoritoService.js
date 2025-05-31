@@ -6,6 +6,11 @@ export const verificaFavorito = async (userId, receitaId) => {
     return response.data;
 }
 
+export const getFavoritosByUserId = async (userId) => {
+    const response = await api.get(endpoints.favoritos+`/user/${userId}`);
+    return response.data;
+}
+
 export const adicionarFavorito = async (userId, receitaId) => {
     const response = await api.post(endpoints.favoritos+`/adicionar?userId=${userId}&receitaId=${receitaId}`);
     return response.data;

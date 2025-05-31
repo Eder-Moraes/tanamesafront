@@ -15,6 +15,11 @@ export const getReceitaById = async (id) => {
     return response.data;
 }
 
+export const getReceitaByUserId = async (id) => {
+    const response = await api.get(endpoints.receitas+`/autor/${id}`);
+    return response.data;
+}
+
 export const getReceitas = async () => {
     const response = await api.get(endpoints.receitas);
     return response.data;
