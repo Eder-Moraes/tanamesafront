@@ -15,6 +15,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import { Picker } from "react-native-web";
 import { salvarReceita } from "../api/services/receitaService";
 import placeholder from "../assets/receita-placeholder.png";
+import { useNavigate } from "react-router-native";
 
 export default function CriarReceita() {
   const [titulo, setTitulo] = useState("");
@@ -24,6 +25,8 @@ export default function CriarReceita() {
   const [rendimento, setRendimento] = useState("");
   const [tempo, setTempo] = useState("");
   const [categoria, setCategoria] = useState("");
+
+  const native = useNavigate();
 
   const [imagemPreview, setImagemPreview] = useState(placeholder);
   const [imagemArquivo, setImagemArquivo] = useState(null);
@@ -102,6 +105,7 @@ export default function CriarReceita() {
       const data = await salvarReceita(formData);
       alert("Sucesso: Receita criada com sucesso!");
       console.log(data);
+      native(`/receitas?idReceita=${data.id}`);
     } catch (error) {
       alert(error?.response?.data?.error || "Erro ao enviar!");
       console.error(error);
@@ -184,7 +188,10 @@ export default function CriarReceita() {
           style={styles.input}
         >
           <Picker.Item label="Selecione uma categoria..." value="" />
-          <Picker.Item label="Comida" value="COMIDA" />
+          <Picker.Item label="Doces" value="DOCES" />
+          <Picker.Item label="Lanches" value="LANCHES" />
+          <Picker.Item label="Massas" value="MASSAS" />
+          <Picker.Item label="Frituras" value="FRITURAS" />
         </Picker>
 
         <View style={styles.buttonContainer}>

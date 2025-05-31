@@ -43,7 +43,7 @@ const autorDefault = {
 };
 
 const abrirLink = (categoria) => {
-  Linking.openURL("http://localhost:8080");
+  Linking.openURL(`http://localhost:8081?categoria=${categoria}`);
 };
 
 const Receita = () => {
@@ -108,6 +108,8 @@ const Receita = () => {
 
   const verifyAutor = async(autor) => {
     const user = await buscarUser();
+    console.log(user);
+    
     setVisible(autor.id !== user.id);
   }
 
@@ -152,7 +154,7 @@ const Receita = () => {
         {/* Categoria */}
         <View style={styles.cat}>
           <Text style={styles.bold}>Categoria: </Text>
-          <TouchableOpacity onPress={abrirLink}>
+          <TouchableOpacity onPress={() => abrirLink(receita.categoria)}>
             <Text style={styles.link}>{receita.categoria}</Text>
           </TouchableOpacity>
         </View>

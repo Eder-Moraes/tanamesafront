@@ -14,3 +14,8 @@ export const getReceitaById = async (id) => {
     const response = await api.get(endpoints.receitas+`/receita/${id}`);
     return response.data;
 }
+
+export const getReceitas = async () => {
+    const response = await api.get(endpoints.receitas);
+    return response.data;
+}

@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 import { NativeRouter, Route, Routes } from "react-router-native"; // Para o react-router-native
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Home from "./app/index";
+import Home from "./app/Home";
 import LoginScreen from "./app/login";
 import CadastroScreen from "./app/cadastro";
 import { UserProvider } from "./context/userContext";

@@ -36,7 +36,7 @@ const CadastroScreen = ({ navigation }) => {
   const handleSubmit = async () => {
     let erros = [];
 
-    if (!nome.trim()) erros.push("Nome completo é obrigatório.");
+    if (!nome.trim()) erros.push("Nome é obrigatório.");
     if (!gmail.trim()) erros.push("Gmail é obrigatório.");
     if (!senha) erros.push("Senha é obrigatória.");
     if (!confirmarSenha) erros.push("Confirmação de senha é obrigatória.");
@@ -106,7 +106,7 @@ const CadastroScreen = ({ navigation }) => {
           >
             <TextInput
               style={[styles.input, isLargeScreen && styles.inputLarge]}
-              placeholder="Nome Completo"
+              placeholder="Nome"
               value={nome}
               onChangeText={setNome}
             />
