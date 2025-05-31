@@ -5,7 +5,8 @@ const endpoints = {
     redefinirSenha: '/password-reset/reset',
     receitas: '/receitas',
     users: '/users',
-    avaliacoes: '/avaliacoes'
+    avaliacoes: '/avaliacoes',
+    favoritos: '/favoritos'
 };
 
 export default endpoints;

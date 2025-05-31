@@ -16,6 +16,7 @@ import {
 } from "../../api/services/AvaliacaoService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { buscarUser } from "../../utils/diversos";
+import { getUserById } from "../../api/services/userService";
 
 // Simulando uma API com comentários de outras pessoas
 const comentariosMock = [
@@ -44,6 +45,7 @@ const Comentarios = ({
   largura = "100%",
   corFundo = "#cacaca",
   id_receita,
+  visibleAutor
 }) => {
   const [comentario, setComentario] = useState("");
   const [listaComentarios, setListaComentarios] = useState([]);
@@ -55,24 +57,25 @@ const Comentarios = ({
   const fechAvaliacoes = async () => {
     try {
       const user = await buscarUser();
-      console.log("User agora: ");
-      console.log(user);
 
       const data = await getAvaliacaoByReceita(id_receita);
 
       const novosComentarios = data.map((avaliacao) => {
+        console.log(avaliacao);
+        
         if (avaliacao.autor.id === user?.id) {
-          setAvalia(avaliacao.quantidade_estrela);
+          setAvalia(avaliacao.quantidadeEstrela);
           setComentario(avaliacao.conteudo);
         }
         return {
-          id: Date.now().toString() + Math.random().toString(36).substring(2), // ID único
-          autor: avaliacao.autor?.name ?? "Usuário",
+          id: avaliacao.autor?.id || Date.now().toString() + Math.random().toString(36).substring(2), // ID único
+          autor: avaliacao.autor?.username ?? "Usuário",
           texto: avaliacao.conteudo,
           imagem: `${BASE_URL}/files/images/${avaliacao.autor.pathImage}`,
-          rating: avaliacao.quantidade_estrela,
+          rating: avaliacao.quantidadeEstrela,
         };
       });
+      
 
       setListaComentarios(novosComentarios);
     } catch (error) {
@@ -80,10 +83,14 @@ const Comentarios = ({
       console.error(error);
     }
   };
-
+  
   useEffect(() => {
     fechAvaliacoes();
   }, []);
+
+  useEffect(() => {
+    setVisible(visibleAutor);
+  }, [visibleAutor]);
 
   const adicionarComentario = async () => {
     try {

@@ -13,6 +13,8 @@ import StarRating from "./components/Avalia";
 import Comentarios from "./components/coment";
 import { getReceitaById } from "../api/services/receitaService";
 import { getUserById } from "../api/services/userService";
+import { buscarUser } from "../utils/diversos";
+import { adicionarFavorito, criarFavorito, removerFavorito, verificaFavorito } from "../api/services/listaFavoritoService";
 
 const receitaDefault = {
   nome: "Bolo de Chocolate",
@@ -48,14 +50,33 @@ const Receita = () => {
   const [clicado, setClicado] = useState(false);
   const [receita, setReceita] = useState(receitaDefault);
   const [autor, setAutor] = useState(autorDefault);
+  const [visible, setVisible] = useState(true);
 
   const searchParams = new URLSearchParams(location.search);
   const id_receita = searchParams.get("idReceita");
 
   const BASE_URL = "http://localhost:8080"; // troque pelo seu IP
 
-  const favorito = () => {
-    setClicado(!clicado);
+  const favorito = async() => {
+    if(!clicado){
+      try {
+        const user = await buscarUser();
+        const data = await adicionarFavorito(user.id, id_receita);
+        setClicado(true);
+      } catch (error) {
+        alert(error?.response?.data?.error || "Erro ao favoritar receita!");
+        console.error(error);
+      }
+    } else{
+      try {
+        const user = await buscarUser();
+        const data = await removerFavorito(user.id, id_receita);
+        setClicado(false);
+      } catch (error) {
+        alert(error?.response?.data?.error || "Erro ao desfavoritar receita!");
+        console.error(error);
+      }
+    }
   };
 
   const fetchReceita = async (id_receita) => {
@@ -65,8 +86,8 @@ const Receita = () => {
         setReceita(data);
         console.log(data);
         const data2 = await getUserById(data.id_autor);
-        console.log(data2);
         setAutor(data2);
+        verifyAutor(data2);
       } catch (error) {
         alert(error?.response?.data?.error || "Erro ao buscar receita!");
         console.error(error);
@@ -74,8 +95,25 @@ const Receita = () => {
     }
   };
 
+  const verifyFavorito = async() => {
+    try {
+        const user = await buscarUser();
+        const data = await verificaFavorito(user.id, id_receita);
+        setClicado(data);
+      } catch (error) {
+        alert(error?.response?.data?.error || "Erro ao buscar receita!");
+        console.error(error);
+      }
+  }
+
+  const verifyAutor = async(autor) => {
+    const user = await buscarUser();
+    setVisible(autor.id !== user.id);
+  }
+
   useEffect(() => {
     fetchReceita(id_receita);
+    verifyFavorito();
   }, [id_receita]);
 
   return (
@@ -119,6 +157,7 @@ const Receita = () => {
           </TouchableOpacity>
         </View>
 
+        <View style={{display: visible ? 'flex':'none'}}>
         <View style={styles.gosto}>
           {/* Botão de favorito */}
           <TouchableOpacity onPress={favorito}>
@@ -126,6 +165,7 @@ const Receita = () => {
               {"♥"}
             </Text>
           </TouchableOpacity>
+        </View>
         </View>
 
         {/* Descrição */}
@@ -164,7 +204,7 @@ const Receita = () => {
 
         {/* Campo de comentários */}
         <View style={styles.coment}>
-          <Comentarios largura={"95%"} corFundo={"#ebd1bc"} id_receita={id_receita}/>
+          <Comentarios largura={"95%"} corFundo={"#ebd1bc"} id_receita={id_receita} visibleAutor={visible}/>
         </View>
       </ScrollView>
     </SafeAreaView>

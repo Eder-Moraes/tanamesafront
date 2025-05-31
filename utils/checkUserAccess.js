@@ -27,7 +27,7 @@ function decodeJWT(token) {
   
       // Verifica se o token expirou
       if (decoded.exp < currentTime) {
-        // Se o token expirou, remove do localStorage e retorna null
+        //Se o token expirou, remove do localStorage e retorna null
         localStorage.removeItem('authToken');
         return null;
       }
