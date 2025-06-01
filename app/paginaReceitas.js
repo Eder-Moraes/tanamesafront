@@ -129,27 +129,31 @@ const Receita = () => {
       <LogoLink></LogoLink>
       <ScrollView style={styles.scroll}>
         {/* Autor */}
-        <View style={styles.autor}>
-          {autor.pathImage ? (
-            <Image
-              source={{
-                uri: `${BASE_URL}/files/images/${
-                  autor.pathImage || autorDefault.pathImage
-                }`,
-              }}
-              style={styles.imagemAutor}
-            />
-          ) : (
-            <Image
-              source="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
-              style={styles.imagemAutor}
-            />
-          )}
+        <TouchableOpacity
+          onPress={() => navigate(`/perfil-publico?id=${autor.id}`)}
+        >
+          <View style={styles.autor}>
+            {autor.pathImage ? (
+              <Image
+                source={{
+                  uri: `${BASE_URL}/files/images/${
+                    autor.pathImage || autorDefault.pathImage
+                  }`,
+                }}
+                style={styles.imagemAutor}
+              />
+            ) : (
+              <Image
+                source="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+                style={styles.imagemAutor}
+              />
+            )}
 
-          <Text style={styles.boldAutor}>
-            <Text style={styles.textoAutor}>{autor.username}</Text>
-          </Text>
-        </View>
+            <Text style={styles.boldAutor}>
+              <Text style={styles.textoAutor}>{autor.username}</Text>
+            </Text>
+          </View>
+        </TouchableOpacity>
 
         {/* Título */}
         <Text style={styles.title}>{receita.nome}</Text>
@@ -186,7 +190,9 @@ const Receita = () => {
           // Botão de editar (vai para /editar-receita?idReceita=...)
           <View style={styles.gosto}>
             <TouchableOpacity
-              onPress={() => navigate(`/editar-receita?idReceita=${id_receita}`)}
+              onPress={() =>
+                navigate(`/editar-receita?idReceita=${id_receita}`)
+              }
             >
               <Text style={styles.editarIconeButton}>✎</Text>
             </TouchableOpacity>
@@ -215,9 +221,7 @@ const Receita = () => {
         {/* Preparo */}
         <View style={styles.quadrado}>
           <Text style={styles.subtitle}>Modo de preparo:</Text>
-          <Text style={styles.info}>
-            {receita.modoPreparo}
-          </Text>
+          <Text style={styles.info}>{receita.modoPreparo}</Text>
         </View>
 
         {/* Rendimento */}

@@ -17,6 +17,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { buscarUser } from "../../utils/diversos";
 import { getUserById } from "../../api/services/userService";
+import { useNavigate } from "react-router-native";
 
 // Simulando uma API com comentários de outras pessoas
 const comentariosMock = [
@@ -45,7 +46,7 @@ const Comentarios = ({
   largura = "100%",
   corFundo = "#cacaca",
   id_receita,
-  visibleAutor
+  visibleAutor,
 }) => {
   const [comentario, setComentario] = useState("");
   const [listaComentarios, setListaComentarios] = useState([]);
@@ -53,6 +54,7 @@ const Comentarios = ({
   const [visible, setVisible] = useState(true);
 
   const BASE_URL = "http://localhost:8080"; // troque pelo seu IP
+  const navigate = useNavigate();
 
   const fechAvaliacoes = async () => {
     try {
@@ -62,25 +64,26 @@ const Comentarios = ({
 
       const novosComentarios = data.map((avaliacao) => {
         console.log(avaliacao);
-        
+
         if (avaliacao.autor.id === user?.id) {
           setAvalia(avaliacao.quantidadeEstrela);
           setComentario(avaliacao.conteudo);
         }
 
-        const linkImage = avaliacao.autor.pathImage ? 
-          `${BASE_URL}/files/images/${avaliacao.autor.pathImage}` 
-          : 'https://i.pinimg.com/236x/21/9e/ae/219eaea67aafa864db091919ce3f5d82.jpg';
+        const linkImage = avaliacao.autor.pathImage
+          ? `${BASE_URL}/files/images/${avaliacao.autor.pathImage}`
+          : "https://i.pinimg.com/236x/21/9e/ae/219eaea67aafa864db091919ce3f5d82.jpg";
 
         return {
-          id: avaliacao.autor?.id || Date.now().toString() + Math.random().toString(36).substring(2), // ID único
+          id:
+            avaliacao.autor?.id ||
+            Date.now().toString() + Math.random().toString(36).substring(2), // ID único
           autor: avaliacao.autor?.username ?? "Usuário",
           texto: avaliacao.conteudo,
           imagem: linkImage,
           rating: avaliacao.quantidadeEstrela,
         };
       });
-      
 
       setListaComentarios(novosComentarios);
     } catch (error) {
@@ -88,7 +91,7 @@ const Comentarios = ({
       console.error(error);
     }
   };
-  
+
   useEffect(() => {
     fechAvaliacoes();
   }, []);
@@ -111,7 +114,7 @@ const Comentarios = ({
         const data = await register(comentarioAdicionar);
 
         const novoComentario = {
-          id: Date.now().toString(),
+          id: user.id,
           autor: user?.username ?? "Usuário",
           texto: comentario,
           imagem: `${BASE_URL}/files/images/${user.pathImage}`,
@@ -167,10 +170,14 @@ const Comentarios = ({
           data={listaComentarios}
           renderItem={({ item }) => (
             <View style={styles.comentarioBox}>
-              <View style={styles.autoria}>
-                <Image source={{ uri: item.imagem }} style={styles.imagem} />
-                <Text style={styles.autor}>{item.autor}:</Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => navigate(`/perfil-publico?id=${item.id}`)}
+              >
+                <View style={styles.autoria}>
+                  <Image source={{ uri: item.imagem }} style={styles.imagem} />
+                  <Text style={styles.autor}>{item.autor}:</Text>
+                </View>
+              </TouchableOpacity>
               <View style={styles.texto}>
                 {/* Botão de avaliação */}
                 <View style={styles.starContainer}>
