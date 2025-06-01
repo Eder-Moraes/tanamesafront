@@ -10,3 +10,10 @@ export const buscarUser = async () => {
     const userToken = JSON.parse(userString);
     return userToken;
   };
+
+export const logout = async () => {
+    await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('authToken');
+    localStorage.removeItem('authToken');
+    window.location.href = '/login';
+}

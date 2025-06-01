@@ -14,11 +14,12 @@ import { Picker } from "@react-native-picker/picker";
 import { launchImageLibrary } from "react-native-image-picker";
 import axios from "axios";
 import { editarUsuario, updateImagePerfil } from "../api/services/userService";
-import { buscarUser } from "../utils/diversos";
+import { buscarUser, logout } from "../utils/diversos";
 import { getReceitaByUserId } from "../api/services/receitaService";
 import { useNavigate, useNavigation } from "react-router-native";
 import { getFavoritosByUserId } from "../api/services/listaFavoritoService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LogoLink from "./components/logoLink";
 
 const ProfileScreen = () => {
   const [name, setName] = useState("");
@@ -204,6 +205,7 @@ const ProfileScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <LogoLink></LogoLink>
       <TouchableOpacity onPress={clicado}>
         <Image source={{ uri: profileImage }} style={styles.profileImage} />
       </TouchableOpacity>
@@ -291,6 +293,9 @@ const ProfileScreen = () => {
           nestedScrollEnabled
         />
       </View>
+      <TouchableOpacity style={styles.editButton} onPress={logout}>
+        <Text style={styles.editButtonText}>Logout</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };

@@ -20,6 +20,8 @@ import {
   removerFavorito,
   verificaFavorito,
 } from "../api/services/listaFavoritoService";
+import { useNavigate } from "react-router-native";
+import LogoLink from "./components/logoLink";
 
 const receitaDefault = {
   nome: "Bolo de Chocolate",
@@ -55,6 +57,7 @@ const Receita = () => {
   const [autor, setAutor] = useState(autorDefault);
   const [visible, setVisible] = useState(true);
 
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const id_receita = searchParams.get("idReceita");
 
@@ -123,6 +126,7 @@ const Receita = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <LogoLink></LogoLink>
       <ScrollView style={styles.scroll}>
         {/* Autor */}
         <View style={styles.autor}>
@@ -210,8 +214,8 @@ const Receita = () => {
 
         {/* Preparo */}
         <View style={styles.quadrado}>
+          <Text style={styles.subtitle}>Modo de preparo:</Text>
           <Text style={styles.info}>
-            <Text style={styles.bold}>Modo de preparo:</Text>{" "}
             {receita.modoPreparo}
           </Text>
         </View>

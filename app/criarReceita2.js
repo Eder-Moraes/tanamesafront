@@ -16,6 +16,7 @@ import { Picker } from "react-native-web";
 import { salvarReceita } from "../api/services/receitaService";
 import placeholder from "../assets/receita-placeholder.png";
 import { useNavigate } from "react-router-native";
+import LogoLink from "./components/logoLink";
 
 export default function CriarReceita() {
   const [titulo, setTitulo] = useState("");
@@ -115,6 +116,7 @@ export default function CriarReceita() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
+        <LogoLink></LogoLink>
         <Text style={styles.header}>Criar Receita</Text>
 
         <TouchableOpacity onPress={clicado}>

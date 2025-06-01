@@ -10,6 +10,15 @@ export const salvarReceita = async (receitaFormData) => {
     return response.data;
 }
 
+export const editarReceita = async (receitaFormData) => {
+    const response = await api.put(endpoints.receitas, receitaFormData, {
+        headers: {
+            'Content-Type':'multipart/form-data'
+        }
+    });
+    return response.data;
+}
+
 export const getReceitaById = async (id) => {
     const response = await api.get(endpoints.receitas+`/receita/${id}`);
     return response.data;

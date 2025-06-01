@@ -48,10 +48,10 @@ api.interceptors.response.use(
     const pathname = window.location.pathname;
 
     if ((status === 401 || status === 403) && !rotasPublicas.includes(pathname)) {
-        // console.warn('Token inválido. Redirecionando para login...');
+        console.warn('Token inválido. Redirecionando para login...');
         localStorage.removeItem('authToken'); // ou AsyncStorage se for nativo
         AsyncStorage.removeItem('authToken'); 
-        // window.location.href = '/login';
+        window.location.href = '/login';
     }
 
     return Promise.reject(error);

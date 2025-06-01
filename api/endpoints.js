@@ -6,7 +6,8 @@ const endpoints = {
     receitas: '/receitas',
     users: '/users',
     avaliacoes: '/avaliacoes',
-    favoritos: '/favoritos'
+    favoritos: '/favoritos',
+    baseFilesImage: 'http://localhost:8080/files/images'
 };
 
 export default endpoints;
