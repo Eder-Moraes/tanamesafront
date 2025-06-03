@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#fdd835",
+    backgroundColor: "#F4BD37",
     justifyContent: "center",
   },
   containerLarge: {

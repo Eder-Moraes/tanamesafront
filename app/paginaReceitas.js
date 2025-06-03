@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
-    backgroundColor: "#FFDAB9",
+    backgroundColor: "#F4BD37",
     alignItems: "center",
     justifyContent: "flex-start",
   },
