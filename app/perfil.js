@@ -157,7 +157,7 @@ const ProfileScreen = () => {
   }, [pais]);
 
   const handleSalvarPerfil = async () => {
-    if (!name || !email || !telefone || !cidade || !pais || !genero || !cep) {
+    if (!name || !email || !cidade || !pais) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }

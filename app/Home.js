@@ -131,9 +131,9 @@ export default function Home() {
           )}
         </TouchableOpacity>
       </View>
-
+      <View style = {{ padding: 20 }}>
       <Text style={styles.titulo}>Tipos de receitas</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sessaoFiltro}>
+      <View style={styles.sessaoFiltro}>
         {filtros.map((f, i) => (
           <TouchableOpacity key={i} onPress={() => handleCategoria(f.nome)}>
             <View style={[styles.filtro, categoriaAtiva === f.nome && styles.filtroAtivo]}>
@@ -142,7 +142,7 @@ export default function Home() {
             </View>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
 
       <Text style={styles.titulo}>Receitas</Text>
       <View style={styles.receitaContainer}>
@@ -156,12 +156,13 @@ export default function Home() {
               source={{ uri: `http://localhost:8080/files/images/${r.imagemUrl}` }}
               style={styles.receitaImg}
             />
+            <Text style={styles.prato}>{r.titulo}</Text>
             <Text style={styles.dificuldade}>Rendimento: {r.rendimento}</Text>
             <Text style={styles.tempo}>Tempo: {r.tempoPreparo}</Text>
             <Text style={styles.cozinheiro}>Autor: {r.nome_autor}</Text>
-            <Text style={styles.prato}>{r.titulo}</Text>
           </TouchableOpacity>
         ))}
+      </View>
       </View>
     </ScrollView>
   );
@@ -169,8 +170,8 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#F4BD37',
+    padding: 0,
+    backgroundColor: '#f4f6f6',
   },
   nav: {
     flexDirection: 'row',
@@ -178,7 +179,17 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginBottom: 20,
     gap: 10,
+    position: 'relative',
+    margin: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    width: '100%',
+    backgroundColor: '#F4BD37',
+    padding: 10,
+
   },
+
   logo: {
     width: 80,
     height: 80,
@@ -194,6 +205,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginRight: 10,
     minWidth: 120,
+    backgroundColor: 'white',
   },
   botao: {
     backgroundColor: 'black',
@@ -213,6 +225,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    border: '2px solid black',
   },
   titulo: {
     fontSize: 20,
@@ -222,10 +235,24 @@ const styles = StyleSheet.create({
   sessaoFiltro: {
     flexDirection: 'row',
     marginBottom: 20,
+    padding: 10,
+    borderRadius: 10,
+    display: 'flex',
+    gap: 10,
   },
   filtro: {
     marginRight: 10,
     position: 'relative',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    elevation: 5,
   },
   filtroAtivo: {
     borderColor: 'black',
@@ -254,16 +281,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   receita: {
-    width: '48%',
+    width: '300px',
+    height: 'auto',
     marginBottom: 20,
+    
     borderWidth: 1,
     borderColor: 'black',
     borderRadius: 10,
     overflow: 'hidden',
+    backgroundColor: '#F4BD37',
+    shadowColor: '#000',
+    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    elevation: 5,
   },
   receitaImg: {
     width: '100%',
     height: 150,
+    resizeMode: 'cover',
   },
   dificuldade: {
     fontWeight: 'bold',
@@ -272,6 +308,7 @@ const styles = StyleSheet.create({
   tempo: {
     paddingHorizontal: 5,
     fontStyle: 'italic',
+    
   },
   cozinheiro: {
     paddingHorizontal: 5,
